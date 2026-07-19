@@ -1,3 +1,4 @@
+
 # Franchise Brand Management System
 
 FBMS is a full stack franchise brand operations dashboard built with React, Vite, Tailwind CSS, Express, JWT authentication, Multer uploads, and MySQL.
@@ -78,3 +79,5 @@ npm run dev:backend
 npm run dev:frontend
 npm run build
 ```
+=======
+# franchise-brand-management-system
