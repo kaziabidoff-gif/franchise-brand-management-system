@@ -4,8 +4,17 @@ export const statusOptions = {
   asset: ['active', 'draft', 'archived'],
   campaign: ['draft', 'scheduled', 'active', 'completed', 'cancelled'],
   guideline: ['draft', 'published', 'archived'],
-  request: ['pending', 'in_review', 'approved', 'rejected']
+  request: ['pending', 'in_review', 'approved', 'rejected', 'needs_revision']
 };
+
+export const requestCategories = [
+  'Poster',
+  'Local Marketing Material',
+  'Branch-Specific Promotion',
+  'Local Event Branding',
+  'Modified Campaign Material',
+  'Other'
+];
 
 export const assetCategories = [
   'Logo',
