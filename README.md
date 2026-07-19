@@ -1,101 +1,194 @@
-FBMS — Franchise Brand Management System
+# 🏢 Franchise Brand Management System (FBMS)
 
-A full-stack web application for centralized franchise brand management.
+> A centralized web-based platform for managing franchise branding, marketing campaigns, brand assets, branch customization requests, and brand consistency across multiple franchise locations.
 
-FBMS helps franchise headquarters manage brand identity, marketing campaigns, brand assets, brand guidelines, branches, users, and franchise customization requests through a centralized system.
+---
 
-⸻
+## 📌 Project Overview
 
-📌 Project Overview
+The **Franchise Brand Management System (FBMS)** is a centralized platform designed to help franchise headquarters manage and maintain consistent branding across all franchise branches.
 
-The system is being developed as a university Software Engineering project using Scrum over four development sprints.
+The system allows headquarters to manage:
 
-Core Modules
+- Brand assets
+- Marketing campaigns
+- Branding guidelines
+- Franchise branches
+- Customization requests
+- Approved promotional materials
+- Branch-level branding activities
 
-* Authentication and authorization
-* Dashboard
-* User management
-* Branch management
-* Campaign management
-* Brand asset management
-* Brand guidelines
-* Franchise customization requests
-* Activity and audit tracking
+Franchise branches can access approved brand materials, submit customization requests, and follow official branding guidelines provided by headquarters.
 
-⸻
+The main goal of FBMS is to ensure that every franchise branch maintains a consistent and professional brand identity while allowing controlled customization where necessary.
 
-🛠️ Technology Stack
+---
 
-Frontend
+## 🎯 Project Goals
 
-* React
-* Vite
-* Tailwind CSS
-* Axios
-* React Router
+- Centralize franchise branding resources.
+- Maintain consistent brand identity across branches.
+- Provide controlled access to approved brand assets.
+- Manage marketing campaigns from headquarters.
+- Allow branches to request customized branding materials.
+- Track branch requests and approval status.
+- Provide a centralized dashboard for monitoring franchise activities.
+- Reduce communication gaps between headquarters and franchise branches.
 
-Backend
+---
 
-* Node.js
-* Express.js
-* REST API
-* JWT Authentication
-* bcrypt
+## ✨ Main Features
 
-Database
+### 🔐 Authentication & User Management
 
-* MySQL
+- Secure user login.
+- Role-based access control.
+- User profiles.
+- Multiple user roles.
+- JWT-based authentication.
+- Protected routes.
 
-Development Tools
+### 🏢 Franchise Branch Management
 
-* Git
-* GitHub
-* VS Code
-* npm
+- View franchise branches.
+- Manage branch information.
+- Assign branch users.
+- Monitor branch activities.
 
-⸻
+### 🎨 Brand Asset Management
 
-📁 Project Structure
+- Upload brand assets.
+- Organize assets by category.
+- Download approved brand materials.
+- Manage asset versions.
+- Control asset visibility.
 
-FBMS/
+### 📢 Marketing Campaign Management
+
+- Create marketing campaigns.
+- Assign campaigns to branches.
+- Set campaign dates.
+- Track campaign status.
+- Manage campaign materials.
+
+### 📖 Branding Guidelines
+
+- Centralized brand guidelines.
+- Logo usage rules.
+- Color guidelines.
+- Typography guidelines.
+- Marketing usage guidelines.
+
+### 📝 Customization Requests
+
+- Branches can submit branding customization requests.
+- Headquarters can review requests.
+- Requests can be approved or rejected.
+- Track request status.
+- Add feedback and comments.
+
+### 📊 Dashboard
+
+- Summary statistics.
+- Branch overview.
+- Campaign overview.
+- Pending requests.
+- Recent activities.
+
+---
+
+# 🛠️ Technology Stack
+
+## Frontend
+
+- React
+- Vite
+- Tailwind CSS
+- Axios
+- React Router
+
+## Backend
+
+- Node.js
+- Express.js
+- JWT Authentication
+- bcrypt
+- REST API
+
+## Database
+
+- MySQL
+
+## Development Tools
+
+- Git
+- GitHub
+- VS Code
+- Postman / cURL
+- MySQL Workbench or MySQL CLI
+
+---
+
+# 📂 Project Structure
+
+```text
+franchise-brand-management-system/
 │
 ├── backend/
 │   ├── src/
 │   │   ├── config/
+│   │   │   ├── db.js
+│   │   │   └── env.js
+│   │   │
 │   │   ├── controllers/
+│   │   │   └── auth.controller.js
+│   │   │
 │   │   ├── middleware/
+│   │   │   ├── auth.middleware.js
+│   │   │   └── error.middleware.js
+│   │   │
 │   │   ├── models/
+│   │   │   └── user.model.js
+│   │   │
 │   │   ├── routes/
+│   │   │   └── auth.routes.js
+│   │   │
 │   │   ├── utils/
+│   │   │   ├── ApiError.js
+│   │   │   └── asyncHandler.js
+│   │   │
 │   │   ├── app.js
 │   │   └── server.js
 │   │
-│   ├── .env
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── layouts/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   │
-│   ├── .env
-│   └── package.json
+│   ├── package.json
+│   └── .env
 │
 ├── database/
 │   ├── schema.sql
 │   └── seed.sql
 │
+├── frontend/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   │   └── api.js
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   ├── package.json
+│   ├── vite.config.js
+│   └── .env
+│
 ├── .gitignore
+├── README.md
 ├── docker-compose.yml
-├── package.json
-└── README.md
-
-⸻
+└── package.json
 
 ⚙️ Prerequisites
 
