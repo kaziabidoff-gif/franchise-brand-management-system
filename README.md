@@ -1,83 +1,583 @@
+FBMS — Franchise Brand Management System
 
-# Franchise Brand Management System
+A full-stack web application for centralized franchise brand management.
 
-FBMS is a full stack franchise brand operations dashboard built with React, Vite, Tailwind CSS, Express, JWT authentication, Multer uploads, and MySQL.
+FBMS helps franchise headquarters manage brand identity, marketing campaigns, brand assets, brand guidelines, branches, users, and franchise customization requests through a centralized system.
 
-## Demo Accounts
+⸻
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Super Admin | `admin@fbms.com` | `Admin123` |
-| Brand Manager | `manager@fbms.com` | `Manager123` |
-| Marketing Executive | `marketing@fbms.com` | `Marketing123` |
-| Graphic Designer | `designer@fbms.com` | `Designer123` |
-| Branch Manager | `branch@fbms.com` | `Branch123` |
+📌 Project Overview
 
-## Local Setup
+The system is being developed as a university Software Engineering project using Scrum over four development sprints.
 
-1. Start MySQL with Docker:
-   ```bash
-   docker compose up -d mysql
-   ```
+Core Modules
 
-2. Configure backend:
-   ```bash
-   cd backend
-   cp .env.example .env
-   npm install
-   npm run seed
-   npm run dev
-   ```
+* Authentication and authorization
+* Dashboard
+* User management
+* Branch management
+* Campaign management
+* Brand asset management
+* Brand guidelines
+* Franchise customization requests
+* Activity and audit tracking
 
-3. Configure frontend:
-   ```bash
-   cd frontend
-   cp .env.example .env
-   npm install
-   npm run dev
-   ```
+⸻
 
-4. Open `http://localhost:5173`.
+🛠️ Technology Stack
 
-Backend health check: `http://localhost:4000/api/health`.
+Frontend
 
-## Project Structure
+* React
+* Vite
+* Tailwind CSS
+* Axios
+* React Router
 
-```text
-backend/
-  src/config
-  src/controllers
-  src/middleware
-  src/models
-  src/routes
-  src/validations
-  src/database
-  src/seeders
-frontend/
-  src/components
-  src/context
-  src/hooks
-  src/layouts
-  src/pages
-  src/routes
-  src/services
-```
+Backend
 
-## Deployment Prep
+* Node.js
+* Express.js
+* REST API
+* JWT Authentication
+* bcrypt
 
-- Frontend: deploy the `frontend` directory to Vercel or Netlify and set `VITE_API_URL` to the backend API URL.
-- Backend: deploy the `backend` directory as a Node service or Docker service and set the `.env` variables from `backend/.env.example`.
-- Database: create a MySQL 8 database, run `backend/src/database/schema.sql`, then run `backend/src/database/seed.sql` if demo data is needed.
-- CORS: set `CLIENT_URL` on the backend to the deployed frontend URL.
+Database
 
-## Useful Scripts
+* MySQL
 
-```bash
-npm run install:all
-npm run seed
-npm run dev:backend
-npm run dev:frontend
-npm run build
-```
-=======
-# franchise-brand-management-system
+Development Tools
+
+* Git
+* GitHub
+* VS Code
+* npm
+
+⸻
+
+📁 Project Structure
+
+FBMS/
+│
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── utils/
+│   │   ├── app.js
+│   │   └── server.js
+│   │
+│   ├── .env
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   ├── .env
+│   └── package.json
+│
+├── database/
+│   ├── schema.sql
+│   └── seed.sql
+│
+├── .gitignore
+├── docker-compose.yml
+├── package.json
+└── README.md
+
+⸻
+
+⚙️ Prerequisites
+
+Before installing FBMS, install the following:
+
+Required
+
+* Node.js
+* npm
+* MySQL
+* Git
+
+Check whether they are installed:
+
+node -v
+npm -v
+mysql --version
+git --version
+
+Recommended:
+
+Node.js: 18+
+npm: 9+
+MySQL: 8+
+
+⸻
+
+📥 1. Clone the Repository
+
+Clone the project:
+
+git clone https://github.com/kaziabidoff-gif/franchise-brand-management-system.git
+
+Navigate into the project:
+
+cd franchise-brand-management-system
+
+⸻
+
+📦 2. Install Dependencies
+
+Install root dependencies:
+
+npm install
+
+Install backend dependencies:
+
+cd backend
+npm install
+
+Install frontend dependencies:
+
+cd ../frontend
+npm install
+
+Return to the project root:
+
+cd ..
+
+⸻
+
+🗄️ 3. Create the MySQL Database
+
+Make sure your MySQL server is running.
+
+You can check MySQL:
+
+mysql -u root -p
+
+⸻
+
+Create the Database Using schema.sql
+
+From the project root, run:
+
+mysql -u root -p < database/schema.sql
+
+Enter your MySQL password when prompted.
+
+The schema file is responsible for creating the database structure, including tables, relationships, constraints, and other database objects.
+
+⸻
+
+Insert Initial Data Using seed.sql
+
+After the database has been created, run:
+
+mysql -u root -p fbms < database/seed.sql
+
+The seed file inserts initial data required for development and testing.
+
+This may include:
+
+* Roles
+* Permissions
+* Users
+* Branches
+* Sample campaigns
+* Sample brand assets
+* Other development data
+
+⸻
+
+Alternative: Using MySQL CLI
+
+You can also enter MySQL:
+
+mysql -u root -p
+
+Then run:
+
+SOURCE database/schema.sql;
+SOURCE database/seed.sql;
+
+If the files are located outside the current directory, provide their full path.
+
+Example:
+
+SOURCE /Users/yourname/path/to/FBMS/database/schema.sql;
+SOURCE /Users/yourname/path/to/FBMS/database/seed.sql;
+
+⸻
+
+🔐 4. Create the Backend .env File
+
+The actual .env file is intentionally not included in GitHub because it may contain passwords and secret keys.
+
+Navigate to the backend:
+
+cd backend
+
+Create a new .env file:
+
+touch .env
+
+Add the required environment variables.
+
+Example:
+
+NODE_ENV=development
+PORT=4000
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=0000
+DB_NAME=fbms
+JWT_SECRET=your_secret_key_here
+JWT_EXPIRES_IN=1d
+JWT_COOKIE_NAME=fbms_token
+
+Important
+
+Change:
+
+DB_PASSWORD=0000
+
+to your own MySQL password.
+
+Also use your own secure JWT secret:
+
+JWT_SECRET=your_secret_key_here
+
+Do not commit the actual .env file to GitHub.
+
+⸻
+
+🌐 5. Create the Frontend .env File
+
+Navigate to the frontend:
+
+cd ../frontend
+
+Create the file:
+
+touch .env
+
+Add:
+
+VITE_API_URL=http://localhost:4000/api
+
+The frontend uses this URL to communicate with the backend API.
+
+⸻
+
+🚀 6. Start the Backend
+
+Open a terminal and navigate to the backend:
+
+cd backend
+
+Start the development server:
+
+npm run dev
+
+The backend should run at:
+
+http://localhost:4000
+
+Test the API:
+
+curl http://localhost:4000/api/health
+
+Expected response:
+
+{
+  "status": "ok"
+}
+
+⸻
+
+💻 7. Start the Frontend
+
+Open a second terminal.
+
+Navigate to the frontend:
+
+cd frontend
+
+Start Vite:
+
+npm run dev
+
+The frontend should be available at:
+
+http://localhost:5173
+
+Open the URL in your browser.
+
+⸻
+
+🔑 8. Test Login
+
+The seed data should provide development accounts.
+
+Example:
+
+Email: admin@fbms.com
+Password: Admin123
+
+If the seed file uses different credentials, use the credentials defined in database/seed.sql.
+
+⸻
+
+🔄 Running the Full Application
+
+You need two terminals.
+
+Terminal 1 — Backend
+
+cd backend
+npm run dev
+
+Terminal 2 — Frontend
+
+cd frontend
+npm run dev
+
+Then open:
+
+http://localhost:5173
+
+⸻
+
+🔌 API Structure
+
+The backend API is available at:
+
+http://localhost:4000/api
+
+Example endpoints:
+
+POST /api/auth/login
+GET  /api/auth/me
+POST /api/auth/logout
+GET  /api/health
+
+Authentication uses JWT.
+
+After login, the frontend stores the authentication token and sends it with API requests using the Authorization header:
+
+Authorization: Bearer <token>
+
+⸻
+
+🧪 Development Workflow
+
+Before starting work:
+
+git checkout main
+git pull origin main
+
+Create a feature branch:
+
+git checkout -b feature/your-feature-name
+
+Example:
+
+git checkout -b feature/campaign-management
+
+Work on your assigned feature.
+
+Check your changes:
+
+git status
+
+Commit:
+
+git add .
+git commit -m "feat: add campaign management"
+
+Push your branch:
+
+git push origin feature/campaign-management
+
+Then create a Pull Request on GitHub.
+
+⸻
+
+⚠️ Important Git Rules
+
+Do not work directly on the main branch for feature development.
+
+Before starting new work:
+
+git checkout main
+git pull origin main
+
+Always create a feature branch.
+
+Do not commit:
+
+.env
+node_modules/
+dist/
+
+Never commit:
+
+* Database passwords
+* JWT secrets
+* API keys
+* Personal credentials
+
+⸻
+
+👥 Team Workflow Documentation
+
+The complete team workflow and feature distribution can be found here:
+
+FBMS Team Workflow Document
+
+⸻
+
+📚 Team Development Context
+
+The following documents contain the development context and responsibilities for individual team members.
+
+Kazi Abiduzzaman
+
+Open Kazi’s Development Context
+
+Labiba Rahman
+
+Open Labiba’s Development Context
+
+Arfin Zaman
+
+Open Arfin’s Development Context
+
+Mir Masoor Ahmed
+
+Open Mir Masoor’s Development Context
+
+⸻
+
+🏃 Scrum Sprint Plan
+
+Sprint 1
+
+Completed.
+
+Deliverable:
+
+* Software Requirements Specification (SRS)
+
+Sprint 2
+
+Deadline:
+
+24 July
+
+Goal:
+
+* Complete approximately half of the website
+* Complete assigned core features
+* Ensure major features are functional and showcaseable
+
+Sprint 3
+
+Goal:
+
+* Complete remaining features
+* Integrate all modules
+* Fix bugs
+* Improve UI and functionality
+
+Sprint 4
+
+Goal:
+
+* Final testing
+* System integration
+* Documentation
+* Final presentation and showcase
+
+⸻
+
+🐛 Troubleshooting
+
+Backend Does Not Start
+
+Check:
+
+node -v
+npm install
+
+Check whether port 4000 is already being used:
+
+lsof -i :4000
+
+Kill a process if necessary:
+
+kill -9 PROCESS_ID
+
+Replace PROCESS_ID with the actual number.
+
+⸻
+
+Frontend Uses the Wrong Port
+
+Check whether port 5173 is already being used:
+
+lsof -i :5173
+
+Kill the process:
+
+kill -9 PROCESS_ID
+
+Then restart:
+
+npm run dev
+
+⸻
+
+Database Connection Error
+
+Verify:
+
+1. MySQL is running.
+2. Database fbms exists.
+3. The credentials in backend/.env are correct.
+4. The MySQL port is correct.
+
+Test:
+
+mysql -u root -p
+
+⸻
+
+CORS Error
+
+Make sure the frontend URL matches the backend CORS configuration.
+
+The default development frontend URL is:
+
+http://localhost:5173
+
+The backend API is:
+
+http://localhost:4000
+
+⸻
+
+📄 License
+
+This project is developed for academic and educational purposes.
