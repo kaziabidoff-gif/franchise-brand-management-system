@@ -537,7 +537,7 @@ Never commit:
 
 The complete team workflow and feature distribution can be found here:
 
-FBMS Team Workflow Document
+https://docs.google.com/document/d/1-CW4IY6HqGYvK8KwbqKPTLoP69-k38qljq6abbU-H_c/edit?usp=drivesdk
 
 ⸻
 
@@ -547,19 +547,19 @@ The following documents contain the development context and responsibilities for
 
 Kazi Abiduzzaman
 
-Open Kazi’s Development Context
+https://docs.google.com/document/d/1-v0UdWzBEjgnl3KTgblwVM1Wv62eJklBjoHppwgMr_E/edit?usp=drivesdk
 
 Labiba Rahman
 
-Open Labiba’s Development Context
+https://docs.google.com/document/d/10Lcj5PIXMLDP7FUn5BPkIXcEQ30BAiLImXqo3VQ71R0/edit?usp=drivesdk
 
 Arfin Zaman
 
-Open Arfin’s Development Context
+https://docs.google.com/document/d/11rObNqb4HQr6Z2O9XZ47UPLJLX5bIG9YEt05fNPARCA/edit?usp=drivesdk
 
 Mir Masoor Ahmed
 
-Open Mir Masoor’s Development Context
+https://docs.google.com/document/d/11ua9b3SG6_dnNnbhe9u7A01m0g3jZfTBBAB2Fcss_tE/edit?usp=drivesdk
 
 ⸻
 
