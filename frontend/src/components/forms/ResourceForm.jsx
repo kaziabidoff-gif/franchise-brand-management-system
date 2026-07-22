@@ -90,15 +90,29 @@ export default function ResourceForm({ fields, record, submitLabel = 'Save', onS
             return <FileInput key={field.name} label={field.label} error={error} accept={field.accept} {...register(field.name, record ? {} : rules)} />;
           }
 
-          if (field.type === 'multiselect' || field.type === 'tags') {
+          if (field.type === 'checkbox-group') {
             return (
-              <Input
-                key={field.name}
-                label={field.label}
-                error={error}
-                placeholder={field.placeholder || 'Comma separated values'}
-                {...register(field.name, rules)}
-              />
+              <div key={field.name} className="md:col-span-2">
+                <label className="block mb-2 font-medium text-slate-700">
+                  {field.label}
+                </label>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {field.options?.map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex items-center gap-2 rounded border p-2 cursor-pointer hover:bg-slate-50"
+                    >
+                      <input
+                        type="checkbox"
+                        value={option.value}
+                        {...register(field.name)}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             );
           }
 
