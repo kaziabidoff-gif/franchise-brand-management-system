@@ -1,17 +1,27 @@
 const { query } = require('../config/db');
 
-const findAll = async (userId, pagination) => {
-  const totalRows = await query('SELECT COUNT(*) AS total FROM notifications WHERE user_id = ?', [userId]);
+const findAll = async (userId, pagination = {}) => {
+  const limit = Number(pagination.limit) || 10;
+  const offset = Number(pagination.offset) || 0;
+
+  const totalRows = await query(
+    'SELECT COUNT(*) AS total FROM notifications WHERE user_id = ?',
+    [userId]
+  );
+
   const rows = await query(
     `SELECT id, title, message, type, is_read, created_at
      FROM notifications
      WHERE user_id = ?
      ORDER BY created_at DESC
-     LIMIT ? OFFSET ?`,
-    [userId, pagination.limit, pagination.offset]
+     LIMIT ${limit} OFFSET ${offset}`,
+    [userId]
   );
 
-  return { rows, total: totalRows[0].total };
+  return {
+    rows,
+    total: totalRows[0].total
+  };
 };
 
 const unreadCount = async (userId) => {
