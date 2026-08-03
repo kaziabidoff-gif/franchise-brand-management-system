@@ -35,25 +35,18 @@ export default function LoginPage() {
   }
 
   const onSubmit = async (values) => {
-  console.log('FORM SUBMITTED:', values);
+    setLoading(true);
 
-  setLoading(true);
-
-  try {
-    const user = await login(values);
-
-    console.log('LOGIN USER:', user);
-
-    showToast('Welcome back to FBMS.');
-
-    navigate('/dashboard', { replace: true });
-  } catch (error) {
-    console.error('LOGIN ERROR:', error);
-    showToast(error.response?.data?.message || 'Login failed.', 'error');
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      await login(values);
+      showToast('Welcome back to FBMS.');
+      navigate('/dashboard', { replace: true });
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Login failed.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const useAccount = (email, password) => {
     setValue('email', email);

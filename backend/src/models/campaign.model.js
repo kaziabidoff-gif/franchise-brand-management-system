@@ -41,13 +41,6 @@ const buildFilters = (filters) => {
 const findAll = async (filters, pagination) => {
   const { whereSql, params } = buildFilters(filters);
 
-  console.log("\n========== CAMPAIGN DEBUG ==========");
-  console.log("WHERE SQL:", whereSql);
-  console.log("PARAMS:", params);
-  console.log("PAGINATION:", pagination);
-  console.log("QUERY PARAMS:", [...params, pagination.limit, pagination.offset]);
-  console.log("====================================\n");
-
   const totalRows = await query(
     `SELECT COUNT(*) AS total FROM campaigns c ${whereSql}`,
     params

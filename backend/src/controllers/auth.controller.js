@@ -23,9 +23,6 @@ const signToken = (user) =>
   );
 
 const login = asyncHandler(async (req, res) => {
-  console.log('LOGIN REQUEST RECEIVED');
-  console.log(req.body);
-
   const user = await userModel.findByEmail(req.body.email);
 
   if (!user) {
@@ -55,8 +52,6 @@ const login = asyncHandler(async (req, res) => {
     secure: env.nodeEnv === 'production',
     maxAge: 24 * 60 * 60 * 1000
   });
-
-  console.log('LOGIN SUCCESS');
 
   res.json({
     token,

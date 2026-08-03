@@ -45,4 +45,16 @@ app.get('/api/health', (req, res) => {
 // Mount ALL API routes
 app.use('/api', routes);
 
+
+const { notFound, errorHandler } = require('./middleware/errorHandler');
+
+// Mount API routes
+app.use('/api', routes);
+
+// 404 handler
+app.use(notFound);
+
+// Global error handler
+app.use(errorHandler);
+
 module.exports = app;
