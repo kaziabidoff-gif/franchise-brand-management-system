@@ -17,10 +17,11 @@ const requireAuth = asyncHandler(async (req, res, next) => {
   const token = getTokenFromRequest(req);
 
   if (!token) {
-    throw new ApiError(401, 'Authentication required.');
+    throw new ApiError(401, "Authentication required.");
   }
 
   const payload = jwt.verify(token, env.jwt.secret);
+
   const users = await query(
     `SELECT u.id, u.name, u.email, u.phone, u.avatar_url, u.status, u.branch_id,
       r.name AS role_name, r.slug AS role_slug, b.name AS branch_name
@@ -31,8 +32,8 @@ const requireAuth = asyncHandler(async (req, res, next) => {
     [payload.id]
   );
 
-  if (!users.length || users[0].status !== 'active') {
-    throw new ApiError(401, 'Your session is no longer valid.');
+  if (!users.length || users[0].status !== "active") {
+    throw new ApiError(401, "Your session is no longer valid.");
   }
 
   req.user = users[0];
@@ -49,3 +50,4 @@ const authorize = (...allowedRoles) => (req, res, next) => {
 };
 
 module.exports = { requireAuth, authorize };
+

@@ -49,14 +49,18 @@ const buildFilters = (filters) => {
 const findAll = async (filters, pagination) => {
   const { whereSql, params } = buildFilters(filters);
   const totalRows = await query(`SELECT COUNT(*) AS total FROM brand_assets a ${whereSql}`, params);
-  const rows = await query(
-    `${assetSelect}
-     ${whereSql}
-     ORDER BY a.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [...params, pagination.limit, pagination.offset]
-  );
+  const limit = Number.parseInt(pagination.limit, 10) || 10;
+  const offset = Number.parseInt(pagination.offset, 10) || 0;
 
+  const rows = await query(
+    
+  `${assetSelect}
+  ${whereSql}
+  ORDER BY a.created_at DESC
+  LIMIT ${limit} OFFSET ${offset}`,
+  params
+);
+  
   return { rows: rows.map(normalizeAsset), total: totalRows[0].total };
 };
 

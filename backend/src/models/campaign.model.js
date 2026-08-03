@@ -40,19 +40,27 @@ const buildFilters = (filters) => {
 
 const findAll = async (filters, pagination) => {
   const { whereSql, params } = buildFilters(filters);
-  const totalRows = await query(`SELECT COUNT(*) AS total FROM campaigns c ${whereSql}`, params);
-  const rows = await query(
-    `${campaignSelect}
-     ${whereSql}
-     GROUP BY c.id
-     ORDER BY c.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [...params, pagination.limit, pagination.offset]
+
+  const totalRows = await query(
+    `SELECT COUNT(*) AS total FROM campaigns c ${whereSql}`,
+    params
   );
 
-  return { rows, total: totalRows[0].total };
-};
+  const rows = await query(
+    `${campaignSelect}
+   ${whereSql}
+   GROUP BY c.id
+   ORDER BY c.created_at DESC
+   LIMIT ${Number(pagination.limit)}
+   OFFSET ${Number(pagination.offset)}`,
+    params
+  );
 
+  return {
+    rows,
+    total: totalRows[0].total
+  };
+};
 const findOptions = () => query('SELECT id, name, status FROM campaigns ORDER BY name ASC');
 
 const findById = async (id) => {

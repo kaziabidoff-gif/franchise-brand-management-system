@@ -31,16 +31,33 @@ const buildFilters = (filters) => {
 
 const findAll = async (filters, pagination) => {
   const { whereSql, params } = buildFilters(filters);
-  const totalRows = await query(`SELECT COUNT(*) AS total FROM branches b ${whereSql}`, params);
-  const rows = await query(
-    `${branchSelect}
-     ${whereSql}
-     ORDER BY b.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [...params, pagination.limit, pagination.offset]
+
+  const totalRows = await query(
+    `SELECT COUNT(*) AS total
+     FROM branches b
+     ${whereSql}`,
+    params
   );
 
-  return { rows, total: totalRows[0].total };
+  // mysql2's pool.execute() (prepared statements) does not reliably support
+  // LIMIT/OFFSET as placeholders. limit/offset are already sanitized to
+  // integers in getPagination(), so it's safe to inline them directly.
+  const safeLimit = Number.isInteger(pagination.limit) ? pagination.limit : parseInt(pagination.limit, 10) || 10;
+  const safeOffset = Number.isInteger(pagination.offset) ? pagination.offset : parseInt(pagination.offset, 10) || 0;
+
+  const sql = `
+    ${branchSelect}
+    ${whereSql}
+    ORDER BY b.created_at DESC
+    LIMIT ${safeLimit} OFFSET ${safeOffset}
+  `;
+
+  const rows = await query(sql, params);
+
+  return {
+    rows,
+    total: totalRows[0].total
+  };
 };
 
 const findOptions = () => query('SELECT id, name, code FROM branches ORDER BY name ASC');

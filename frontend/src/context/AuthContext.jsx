@@ -17,30 +17,21 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(Boolean(localStorage.getItem('fbms_token')));
 
   const persistSession = useCallback((nextToken, nextUser) => {
-  console.log('Persisting session');
+    localStorage.setItem('fbms_token', nextToken);
+    localStorage.setItem('fbms_user', JSON.stringify(nextUser));
 
-  localStorage.setItem('fbms_token', nextToken);
-  localStorage.setItem('fbms_user', JSON.stringify(nextUser));
-
-  setToken(nextToken);
-  setUser(nextUser);
-}, []);
+    setToken(nextToken);
+    setUser(nextUser);
+  }, []);
 
   const login = useCallback(
-  async (credentials) => {
-    console.log('1. LOGIN FUNCTION CALLED');
-    console.log('2. Credentials:', credentials);
-    console.log('3. API BASE URL:', api.defaults.baseURL);
-
-    const response = await api.post('/auth/login', credentials);
-
-    console.log('4. RESPONSE RECEIVED:', response);
-
-    persistSession(response.data.token, response.data.user);
-    return response.data.user;
-  },
-  [persistSession]
-);
+    async (credentials) => {
+      const response = await api.post('/auth/login', credentials);
+      persistSession(response.data.token, response.data.user);
+      return response.data.user;
+    },
+    [persistSession]
+  );
 
   const refreshUser = useCallback(async () => {
     if (!localStorage.getItem('fbms_token')) {

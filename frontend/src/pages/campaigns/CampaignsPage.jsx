@@ -20,15 +20,21 @@ export default function CampaignsPage() {
         { name: 'budget', label: 'Budget', type: 'number', defaultValue: 0 },
         {
           name: 'branch_ids',
-          label: 'Branch IDs',
-          type: 'multiselect',
-          placeholder: branches.map((branch) => branch.id).join(', ') || '1, 2, 3'
+          label: 'Branches',
+          type: 'checkbox-group',
+          options: branches.map((branch) => ({
+            value: branch.id,
+            label: branch.name
+          }))
         },
         {
           name: 'asset_ids',
-          label: 'Asset IDs',
-          type: 'multiselect',
-          placeholder: assets.map((asset) => asset.id).slice(0, 6).join(', ') || '1, 2, 3'
+          label: 'Assets',
+          type: 'checkbox-group',
+          options: assets.map((asset) => ({
+            value: asset.id,
+            label: asset.title
+          }))
         },
         { name: 'description', label: 'Description', type: 'textarea' }
       ]}

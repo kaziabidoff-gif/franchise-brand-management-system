@@ -43,6 +43,7 @@ const buildFilters = (filters) => {
 
 const findAll = async (filters, pagination) => {
   const { whereSql, params } = buildFilters(filters);
+
   const totalRows = await query(
     `SELECT COUNT(*) AS total
      FROM users u
@@ -51,15 +52,20 @@ const findAll = async (filters, pagination) => {
      ${whereSql}`,
     params
   );
+
   const rows = await query(
     `${userSelect}
      ${whereSql}
      ORDER BY u.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [...params, pagination.limit, pagination.offset]
+     LIMIT ${Number(pagination.limit)}
+     OFFSET ${Number(pagination.offset)}`,
+    params
   );
 
-  return { rows, total: totalRows[0].total };
+  return {
+    rows,
+    total: totalRows[0].total
+  };
 };
 
 const findById = async (id) => {

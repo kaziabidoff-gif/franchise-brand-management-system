@@ -49,12 +49,18 @@ const buildFilters = (filters) => {
 const findAll = async (filters, pagination) => {
   const { whereSql, params } = buildFilters(filters);
   const totalRows = await query(`SELECT COUNT(*) AS total FROM customization_requests cr ${whereSql}`, params);
+
+  // mysql2's pool.execute() does not reliably support LIMIT/OFFSET as
+  // placeholders. Values are already sanitized to integers in getPagination().
+  const safeLimit = Number.isInteger(pagination.limit) ? pagination.limit : parseInt(pagination.limit, 10) || 10;
+  const safeOffset = Number.isInteger(pagination.offset) ? pagination.offset : parseInt(pagination.offset, 10) || 0;
+
   const rows = await query(
     `${requestSelect}
      ${whereSql}
      ORDER BY cr.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [...params, pagination.limit, pagination.offset]
+     LIMIT ${safeLimit} OFFSET ${safeOffset}`,
+    params
   );
 
   return { rows, total: totalRows[0].total };
