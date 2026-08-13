@@ -11,6 +11,7 @@ const toneMap = {
   inactive: 'bg-slate-100 text-slate-600 ring-slate-200',
   archived: 'bg-slate-100 text-slate-600 ring-slate-200',
   rejected: 'bg-red-50 text-red-700 ring-red-200',
+  needs_revision: 'bg-purple-50 text-purple-700 ring-purple-200',
   cancelled: 'bg-red-50 text-red-700 ring-red-200',
   urgent: 'bg-red-50 text-red-700 ring-red-200',
   high: 'bg-orange-50 text-orange-700 ring-orange-200',

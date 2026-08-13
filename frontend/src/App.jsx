@@ -10,7 +10,9 @@ import BranchesPage from './pages/branches/BranchesPage';
 import AssetsPage from './pages/assets/AssetsPage';
 import CampaignsPage from './pages/campaigns/CampaignsPage';
 import GuidelinesPage from './pages/guidelines/GuidelinesPage';
-import RequestsPage from './pages/requests/RequestsPage';
+import RequestListPage from './pages/requests/RequestListPage';
+import CreateRequestPage from './pages/requests/CreateRequestPage';
+import RequestDetailsPage from './pages/requests/RequestDetailsPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import ReportsPage from './pages/reports/ReportsPage';
 import ProfilePage from './pages/profile/ProfilePage';
@@ -32,7 +34,9 @@ export default function App() {
           <Route path="/assets" element={<AssetsPage />} />
           <Route path="/campaigns" element={<CampaignsPage />} />
           <Route path="/guidelines" element={<GuidelinesPage />} />
-          <Route path="/requests" element={<RequestsPage />} />
+          <Route path="/requests" element={<RequestListPage />} />
+          <Route path="/requests/new" element={<CreateRequestPage />} />
+          <Route path="/requests/:id" element={<RequestDetailsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
