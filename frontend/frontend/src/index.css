@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  background: #F5F7FB;
+}
+
+html.dark {
+  background: #12141F;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: #12141F;
+  font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.dark body {
+  color: #E1E5EE;
+}
+
+/*
+ * Dark/light mode switch: driven by document.startViewTransition (see
+ * ThemeContext). The browser crossfades a snapshot of the old page into the
+ * new one as a single compositor op — smooth and cheap regardless of how
+ * many elements change color.
+ *
+ * Earlier attempt, for reference: putting `transition: background-color,
+ * border-color, box-shadow, ...` on `*` looked fine in theory but forced the
+ * browser to repaint every element's colors every frame, which combined with
+ * backdrop-blur elements caused real dropped-frame stutter. Don't reintroduce
+ * that — if a fallback transition is ever needed for browsers without View
+ * Transitions support, keep it to `body`'s background/color only (below),
+ * never a universal selector.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@supports not (view-transition-name: root) {
+  /* Cheap fallback for browsers without View Transitions (e.g. current
+     Firefox/Safari): fade just the two elements that actually carry the
+     page's base colors, not every element on the page. */
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+h1, h2, h3, h4 {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Visible keyboard focus everywhere, not just on elements that opt in. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #3568E0;
+  outline-offset: 2px;
+}
+
+.table-scroll {
+  scrollbar-width: thin;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
