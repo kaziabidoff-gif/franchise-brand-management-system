@@ -10,6 +10,7 @@ const listRequests = asyncHandler(async (req, res) => {
       search: req.query.search,
       status: req.query.status,
       priority: req.query.priority,
+      category: req.query.category,
       branchId: req.user.role_slug === 'branch_manager' ? req.user.branch_id : req.query.branch_id
     },
     pagination
@@ -30,7 +31,13 @@ const getRequest = asyncHandler(async (req, res) => {
 
 const createRequest = asyncHandler(async (req, res) => {
   const branchId = req.user.role_slug === 'branch_manager' ? req.user.branch_id : req.body.branch_id;
-  const request = await requestModel.create({ ...req.body, branch_id: branchId, requested_by: req.user.id });
+  const referenceUrl = req.file ? `/uploads/${req.file.filename}` : req.body.reference_url;
+  const request = await requestModel.create({
+    ...req.body,
+    branch_id: branchId,
+    requested_by: req.user.id,
+    reference_url: referenceUrl
+  });
   res.status(201).json({ data: request });
 });
 
@@ -41,7 +48,11 @@ const updateRequest = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Customization request not found.');
   }
 
-  const request = await requestModel.update(req.params.id, req.body);
+  const payload = { ...req.body };
+  if (req.file) {
+    payload.reference_url = `/uploads/${req.file.filename}`;
+  }
+  const request = await requestModel.update(req.params.id, payload);
   res.json({ data: request });
 });
 
@@ -74,6 +85,15 @@ const rejectRequest = asyncHandler(async (req, res) => {
   res.json({ data: request });
 });
 
+const requestRevision = asyncHandler(async (req, res) => {
+  const request = await requestModel.update(req.params.id, {
+    status: 'needs_revision',
+    response: req.body.response || 'Revision requested.'
+  });
+
+  res.json({ data: request });
+});
+
 module.exports = {
   listRequests,
   getRequest,
@@ -81,5 +101,6 @@ module.exports = {
   updateRequest,
   deleteRequest,
   approveRequest,
-  rejectRequest
+  rejectRequest,
+  requestRevision
 };

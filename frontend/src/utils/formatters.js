@@ -30,3 +30,25 @@ export const initials = (name = 'FBMS') =>
     .join('')
     .slice(0, 2)
     .toUpperCase();
+
+// Uploaded files come back as relative paths like "/uploads/xyz.png" from the
+// backend's static file server, which resolve against the wrong origin
+// (the Vite dev server, not the API server) if used as-is in <img src>.
+export const resolveFileUrl = (url) => {
+  if (!url || typeof url !== 'string') {
+    return null;
+  }
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+  // Anything that isn't an absolute URL and doesn't start with '/' isn't a
+  // real path from our upload system (e.g. junk placeholder text) -- don't
+  // try to turn it into a fetchable URL.
+  if (!url.startsWith('/')) {
+    return null;
+  }
+  const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:4000/api').replace(/\/api\/?$/, '');
+  return `${apiOrigin}${url}`;
+};
+
+export const isImageUrl = (url = '') => /\.(png|jpe?g|gif|webp|svg|avif)$/i.test(url);

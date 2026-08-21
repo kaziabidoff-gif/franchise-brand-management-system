@@ -1,8 +1,8 @@
 const { query } = require('../config/db');
 
 const requestSelect = `
-  SELECT cr.id, cr.title, cr.description, cr.branch_id, cr.requested_by,
-    cr.assigned_to, cr.asset_id, cr.status, cr.priority, cr.response,
+  SELECT cr.id, cr.title, cr.description, cr.category, cr.due_date, cr.branch_id, cr.requested_by,
+    cr.assigned_to, cr.asset_id, cr.reference_url, cr.status, cr.priority, cr.response,
     cr.created_at, cr.updated_at,
     b.name AS branch_name,
     requester.name AS requested_by_name,
@@ -33,6 +33,11 @@ const buildFilters = (filters) => {
   if (filters.priority) {
     where.push('cr.priority = ?');
     params.push(filters.priority);
+  }
+
+  if (filters.category) {
+    where.push('cr.category = ?');
+    params.push(filters.category);
   }
 
   if (filters.branchId) {
@@ -74,15 +79,18 @@ const findById = async (id) => {
 const create = async (data) => {
   const result = await query(
     `INSERT INTO customization_requests
-      (title, description, branch_id, requested_by, assigned_to, asset_id, status, priority, response)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (title, description, category, due_date, branch_id, requested_by, assigned_to, asset_id, reference_url, status, priority, response)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       data.title,
       data.description,
+      data.category || null,
+      data.due_date || null,
       data.branch_id,
       data.requested_by || null,
       data.assigned_to || null,
       data.asset_id || null,
+      data.reference_url || null,
       data.status || 'pending',
       data.priority || 'medium',
       data.response || null
@@ -96,7 +104,7 @@ const update = async (id, data) => {
   const fields = [];
   const params = [];
 
-  ['title', 'description', 'branch_id', 'assigned_to', 'asset_id', 'status', 'priority', 'response'].forEach((field) => {
+  ['title', 'description', 'category', 'due_date', 'branch_id', 'assigned_to', 'asset_id', 'reference_url', 'status', 'priority', 'response'].forEach((field) => {
     if (Object.prototype.hasOwnProperty.call(data, field)) {
       fields.push(`${field} = ?`);
       params.push(data[field] || null);

@@ -2,6 +2,7 @@ import { FiDownload } from 'react-icons/fi';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import ResourcePage from '../../components/common/ResourcePage';
+import AssetThumbnail from '../../components/assets/AssetThumbnail';
 import useOptions from '../../hooks/useOptions';
 import { API_BASE_URL } from '../../services/api';
 import { assetCategories, assetTypes, statusOptions } from '../../constants/options';
@@ -42,10 +43,10 @@ export default function AssetsPage() {
           header: 'Asset',
           render: (row) => (
             <div className="flex items-center gap-3">
-              <img className="h-12 w-16 rounded-md object-cover" src={row.thumbnail_url || row.file_url} alt="" />
+              <AssetThumbnail asset={row} />
               <div>
-                <p className="font-bold text-slate-900">{row.title}</p>
-                <p className="text-xs text-slate-500">v{row.version}</p>
+                <p className="font-bold text-ink-900 dark:text-white">{row.title}</p>
+                <p className="text-xs text-ink-500 dark:text-ink-400">v{row.version}</p>
               </div>
             </div>
           )
