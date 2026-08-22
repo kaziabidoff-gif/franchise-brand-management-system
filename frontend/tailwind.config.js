@@ -57,12 +57,23 @@ export default {
         popIn: {
           '0%': { opacity: '0', transform: 'scale(0.96) translateY(4px)' },
           '100%': { opacity: '1', transform: 'scale(1) translateY(0)' }
+        },
+        // Page-route entrance only — deliberately transform-only (no
+        // opacity keyframe at all) so it's physically incapable of reading
+        // as a fade/crossfade. The previous page is already gone by the
+        // time this runs (plain unmount + mount on route change), so this
+        // is purely "the new page settles into place," not a blend between
+        // two layers.
+        pageEnter: {
+          '0%': { transform: 'translateY(14px)' },
+          '100%': { transform: 'translateY(0)' }
         }
       },
       animation: {
         'fade-up': 'fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both',
         'slide-in': 'slideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both',
-        'pop-in': 'popIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both'
+        'pop-in': 'popIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+        'page-enter': 'pageEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) both'
       }
     }
   },

@@ -13,6 +13,7 @@ import ErrorState from '../../components/common/ErrorState';
 import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/cards/StatCard';
 import Badge from '../../components/ui/Badge';
+import TodoList from '../../components/dashboard/TodoList';
 import api from '../../services/api';
 import { navItems } from '../../constants/navigation';
 import { formatDate } from '../../utils/formatters';
@@ -64,7 +65,7 @@ export default function DashboardPage() {
           <StatCard key={card.label} {...card} icon={iconMap[card.label]} />
         ))}
       </div>
-      <div className="grid gap-5 xl:grid-cols-[1fr_22rem]">
+      <div className="grid gap-5 xl:grid-cols-[1fr_30rem]">
         <section className="rounded-lg border border-ink-200 bg-white p-5 dark:border-ink-700 dark:bg-ink-900">
           <h2 className="text-lg font-bold text-ink-950 dark:text-white">Recent activities</h2>
           <div className="mt-4 space-y-3">
@@ -81,30 +82,38 @@ export default function DashboardPage() {
             ))}
           </div>
         </section>
-        <section className="rounded-lg border border-ink-200 bg-white p-5 dark:border-ink-700 dark:bg-ink-900">
-          <h2 className="text-lg font-bold text-ink-950 dark:text-white">Quick actions</h2>
-          <div className="mt-4 grid gap-2">
-            {dashboard.quickActions.map((key) => {
-              const item = navItems.find((navItem) => navItem.key === key);
+        <div className="space-y-5">
+          <TodoList />
+          <section className="rounded-lg border border-ink-200 bg-white p-5 dark:border-ink-700 dark:bg-ink-900">
+            <h2 className="text-lg font-bold text-ink-950 dark:text-white">Quick actions</h2>
+            <div className="mt-4 grid grid-cols-4 gap-3">
+              {dashboard.quickActions.map((key) => {
+                const item = navItems.find((navItem) => navItem.key === key);
 
-              if (!item) {
-                return null;
-              }
+                if (!item) {
+                  return null;
+                }
 
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={key}
-                  to={item.path}
-                  className="flex items-center gap-3 rounded-md border border-ink-200 px-3 py-3 text-sm font-semibold text-ink-700 hover:border-brand-200 hover:bg-brand-50 dark:border-ink-700 dark:text-ink-200 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
-                >
-                  <Icon className="text-brand-600 dark:text-brand-400" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-        </section>
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={key}
+                    to={item.path}
+                    title={item.label}
+                    className="group flex flex-col items-center justify-center gap-2 rounded-lg border border-ink-200 px-2 py-3 text-center transition hover:border-brand-200 hover:bg-brand-50 dark:border-ink-700 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
+                  >
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink-100 text-ink-600 transition group-hover:bg-brand-100 group-hover:text-brand-600 dark:bg-ink-800 dark:text-ink-300 dark:group-hover:bg-brand-500/20 dark:group-hover:text-brand-300">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="w-full truncate text-[11px] font-semibold text-ink-700 dark:text-ink-200">
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );

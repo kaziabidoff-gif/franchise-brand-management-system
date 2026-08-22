@@ -11,6 +11,7 @@ router.get('/options', branchController.branchOptions);
 router.get('/', branchController.listBranches);
 router.post('/', authorize('super_admin', 'brand_manager'), branchRules, validate, branchController.createBranch);
 router.get('/:id', idParam, validate, branchController.getBranch);
+router.get('/:id/assets', idParam, validate, branchController.getBranchAssets);
 router.put('/:id', authorize('super_admin', 'brand_manager'), updateBranchRules, validate, branchController.updateBranch);
 router.delete('/:id', authorize('super_admin'), idParam, validate, branchController.deleteBranch);
 

@@ -66,6 +66,21 @@ const findAll = async (filters, pagination) => {
 
 const findOptions = () => query('SELECT id, title, category, version FROM brand_assets ORDER BY title ASC');
 
+// Category breakdown for a branch's asset library (includes global assets,
+// same visibility rule as the branch-scoped listing itself) — powers the
+// Branch View summary strip.
+const countByCategory = async (branchId) => {
+  const rows = await query(
+    `SELECT category, COUNT(*) AS total
+     FROM brand_assets
+     WHERE branch_id = ? OR branch_id IS NULL
+     GROUP BY category
+     ORDER BY total DESC`,
+    [branchId]
+  );
+  return rows;
+};
+
 const findById = async (id) => {
   const rows = await query(`${assetSelect} WHERE a.id = ? LIMIT 1`, [id]);
   return normalizeAsset(rows[0]);
@@ -131,4 +146,4 @@ const getLocalFilePath = (fileUrl) => {
   return fs.existsSync(filePath) ? filePath : null;
 };
 
-module.exports = { findAll, findOptions, findById, create, update, remove, getLocalFilePath };
+module.exports = { findAll, findOptions, countByCategory, findById, create, update, remove, getLocalFilePath };

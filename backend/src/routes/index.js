@@ -10,6 +10,7 @@ const notificationRoutes = require('./notification.routes');
 const dashboardRoutes = require('./dashboard.routes');
 const reportRoutes = require('./report.routes');
 const profileRoutes = require('./profile.routes');
+const todoRoutes = require('./todo.routes');
 
 const router = express.Router();
 
@@ -24,5 +25,6 @@ router.use('/requests', requestRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/reports', reportRoutes);
 router.use('/profile', profileRoutes);
+router.use('/todos', todoRoutes);
 
 module.exports = router;

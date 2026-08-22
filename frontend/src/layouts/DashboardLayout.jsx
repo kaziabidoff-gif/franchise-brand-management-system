@@ -26,7 +26,7 @@ export default function DashboardLayout() {
           <div className="mb-5">
             <Breadcrumb />
           </div>
-          <div key={location.pathname} className="animate-fade-up">
+          <div key={location.pathname} className="animate-page-enter">
             <Outlet />
           </div>
         </main>

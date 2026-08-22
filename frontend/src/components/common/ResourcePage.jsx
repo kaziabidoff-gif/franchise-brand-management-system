@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import ErrorState from './ErrorState';
 import PageHeader from './PageHeader';
@@ -23,7 +23,10 @@ export default function ResourcePage({
   canDelete = true,
   multipart = false,
   transformSubmit,
-  extraActions
+  extraActions,
+  extraHeaderActions,
+  autoOpenCreate = false,
+  onAutoOpened
 }) {
   const { showToast } = useToast();
   const [modalRecord, setModalRecord] = useState(null);
@@ -46,6 +49,14 @@ export default function ResourcePage({
     setModalRecord(null);
     setModalOpen(true);
   };
+
+  useEffect(() => {
+    if (autoOpenCreate) {
+      openCreate();
+      onAutoOpened?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpenCreate]);
 
   const openEdit = async (record) => {
     setModalOpen(true);
@@ -101,11 +112,14 @@ export default function ResourcePage({
         title={title}
         description={description}
         actions={
-          canCreate ? (
-            <Button icon={FiPlus} onClick={openCreate}>
-              Add {title.replace(/s$/, '')}
-            </Button>
-          ) : null
+          <>
+            {extraHeaderActions}
+            {canCreate ? (
+              <Button icon={FiPlus} onClick={openCreate}>
+                Add {title.replace(/s$/, '')}
+              </Button>
+            ) : null}
+          </>
         }
       />
       <FilterBar search={resource.params.search || ''} onSearch={resource.setSearch} filters={activeFilters} />

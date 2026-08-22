@@ -4,6 +4,7 @@ USE fbms;
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS activities;
 DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS todos;
 DROP TABLE IF EXISTS customization_requests;
 DROP TABLE IF EXISTS campaign_assets;
 DROP TABLE IF EXISTS campaign_branches;
@@ -181,4 +182,20 @@ CREATE TABLE activities (
   CONSTRAINT fk_activities_actor FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL,
   INDEX idx_activities_created_at (created_at),
   INDEX idx_activities_entity (entity_type, entity_id)
+);
+
+CREATE TABLE todos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  priority ENUM('low', 'medium', 'high', 'urgent') NOT NULL DEFAULT 'medium',
+  is_done TINYINT(1) NOT NULL DEFAULT 0,
+  due_date DATE NULL,
+  position INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_todos_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_todos_user_done (user_id, is_done),
+  INDEX idx_todos_user_position (user_id, position),
+  INDEX idx_todos_user_priority (user_id, priority)
 );
