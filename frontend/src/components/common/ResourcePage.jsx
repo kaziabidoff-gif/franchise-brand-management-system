@@ -131,6 +131,8 @@ export default function ResourcePage({
         actions={{
           edit: canEdit ? openEdit : undefined,
           delete: canDelete ? setDeleteRecord : undefined,
+          canEdit: typeof canEdit === 'function' ? canEdit : undefined,
+          canDelete: typeof canDelete === 'function' ? canDelete : undefined,
           extra: extraActions ? (row) => extraActions(row, resource.reload) : undefined
         }}
       />

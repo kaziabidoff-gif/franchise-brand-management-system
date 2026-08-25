@@ -52,8 +52,12 @@ export default function DataTable({ columns, rows, loading, actions = {}, getRow
                     <td className="px-4 py-4 text-right">
                       <div className="flex justify-end gap-2">
                         {actions.view ? <IconAction label="View" icon={FiEye} onClick={() => actions.view(row)} /> : null}
-                        {actions.edit ? <IconAction label="Edit" icon={FiEdit2} onClick={() => actions.edit(row)} /> : null}
-                        {actions.delete ? <IconAction label="Delete" icon={FiTrash2} onClick={() => actions.delete(row)} danger /> : null}
+                        {actions.edit && (!actions.canEdit || actions.canEdit(row)) ? (
+                          <IconAction label="Edit" icon={FiEdit2} onClick={() => actions.edit(row)} />
+                        ) : null}
+                        {actions.delete && (!actions.canDelete || actions.canDelete(row)) ? (
+                          <IconAction label="Delete" icon={FiTrash2} onClick={() => actions.delete(row)} danger />
+                        ) : null}
                         {actions.extra ? actions.extra(row) : null}
                       </div>
                     </td>

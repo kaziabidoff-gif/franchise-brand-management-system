@@ -2,6 +2,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const { getPagination, paginationMeta } = require('../utils/pagination');
 const campaignModel = require('../models/campaign.model');
+const { logActivity } = require('../models/activity.model');
 
 const listCampaigns = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -34,6 +35,15 @@ const getCampaign = asyncHandler(async (req, res) => {
 
 const createCampaign = asyncHandler(async (req, res) => {
   const campaign = await campaignModel.create({ ...req.body, created_by: req.user.id });
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'campaign',
+    entityId: campaign.id,
+    action: 'create',
+    description: `${req.user.name} created campaign ${campaign.name}`
+  });
+
   res.status(201).json({ data: campaign });
 });
 
@@ -45,6 +55,17 @@ const updateCampaign = asyncHandler(async (req, res) => {
   }
 
   const campaign = await campaignModel.update(req.params.id, req.body);
+
+  if (req.body.status && req.body.status !== existing.status) {
+    await logActivity({
+      actorId: req.user.id,
+      entityType: 'campaign',
+      entityId: campaign.id,
+      action: req.body.status,
+      description: `${req.user.name} marked campaign ${campaign.name} as ${req.body.status}`
+    });
+  }
+
   res.json({ data: campaign });
 });
 
@@ -56,6 +77,15 @@ const deleteCampaign = asyncHandler(async (req, res) => {
   }
 
   await campaignModel.remove(req.params.id);
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'campaign',
+    entityId: existing.id,
+    action: 'delete',
+    description: `${req.user.name} removed campaign ${existing.name}`
+  });
+
   res.status(204).send();
 });
 

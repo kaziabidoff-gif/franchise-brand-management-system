@@ -2,6 +2,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const { getPagination, paginationMeta } = require('../utils/pagination');
 const requestModel = require('../models/customizationRequest.model');
+const { logActivity } = require('../models/activity.model');
 
 const listRequests = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -38,6 +39,15 @@ const createRequest = asyncHandler(async (req, res) => {
     requested_by: req.user.id,
     reference_url: referenceUrl
   });
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'request',
+    entityId: request.id,
+    action: 'submit',
+    description: `${req.user.name} submitted a customization request: ${request.title}`
+  });
+
   res.status(201).json({ data: request });
 });
 
@@ -64,6 +74,15 @@ const deleteRequest = asyncHandler(async (req, res) => {
   }
 
   await requestModel.remove(req.params.id);
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'request',
+    entityId: existing.id,
+    action: 'delete',
+    description: `${req.user.name} removed request: ${existing.title}`
+  });
+
   res.status(204).send();
 });
 
@@ -71,6 +90,14 @@ const approveRequest = asyncHandler(async (req, res) => {
   const request = await requestModel.update(req.params.id, {
     status: 'approved',
     response: req.body.response || 'Approved.'
+  });
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'request',
+    entityId: request.id,
+    action: 'approve',
+    description: `${req.user.name} approved request: ${request.title}`
   });
 
   res.json({ data: request });
@@ -82,6 +109,14 @@ const rejectRequest = asyncHandler(async (req, res) => {
     response: req.body.response || 'Rejected.'
   });
 
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'request',
+    entityId: request.id,
+    action: 'reject',
+    description: `${req.user.name} rejected request: ${request.title}`
+  });
+
   res.json({ data: request });
 });
 
@@ -89,6 +124,14 @@ const requestRevision = asyncHandler(async (req, res) => {
   const request = await requestModel.update(req.params.id, {
     status: 'needs_revision',
     response: req.body.response || 'Revision requested.'
+  });
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'request',
+    entityId: request.id,
+    action: 'request_revision',
+    description: `${req.user.name} requested revisions for: ${request.title}`
   });
 
   res.json({ data: request });

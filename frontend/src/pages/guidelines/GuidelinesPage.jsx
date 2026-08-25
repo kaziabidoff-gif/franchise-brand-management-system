@@ -5,11 +5,14 @@ import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import ResourcePage from '../../components/common/ResourcePage';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { formatDate } from '../../utils/formatters';
 import { statusOptions } from '../../constants/options';
+import { can } from '../../utils/permissions';
 
 export default function GuidelinesPage() {
+  const { user } = useAuth();
   const { showToast } = useToast();
   const [viewRecord, setViewRecord] = useState(null);
 
@@ -25,6 +28,9 @@ export default function GuidelinesPage() {
         title="Brand Guidelines"
         description="Publish and maintain brand usage rules for every branch."
         endpoint="/guidelines"
+        canCreate={can(user, 'guidelines', 'create')}
+        canEdit={can(user, 'guidelines', 'edit')}
+        canDelete={can(user, 'guidelines', 'delete')}
         fields={[
           { name: 'title', label: 'Title', required: true },
           { name: 'version', label: 'Version', defaultValue: '1.0' },
@@ -52,7 +58,7 @@ export default function GuidelinesPage() {
             <Button size="sm" variant="secondary" icon={FiBookOpen} onClick={() => setViewRecord(row)}>
               View
             </Button>
-            {row.status !== 'published' ? (
+            {row.status !== 'published' && can(user, 'guidelines', 'publish') ? (
               <Button size="sm" icon={FiUploadCloud} onClick={() => publish(row, reload)}>
                 Publish
               </Button>

@@ -4,6 +4,7 @@ const ApiError = require('../utils/ApiError');
 const { getPagination, paginationMeta } = require('../utils/pagination');
 const userModel = require('../models/user.model');
 const roleModel = require('../models/role.model');
+const { logActivity } = require('../models/activity.model');
 
 const listUsers = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -45,6 +46,14 @@ const createUser = asyncHandler(async (req, res) => {
   const passwordHash = await bcrypt.hash(req.body.password, 10);
   const user = await userModel.create({ ...req.body, password_hash: passwordHash });
 
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'user',
+    entityId: user.id,
+    action: 'create',
+    description: `${req.user.name} created a user account for ${user.name}`
+  });
+
   res.status(201).json({ data: user });
 });
 
@@ -74,11 +83,29 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 
   await userModel.remove(req.params.id);
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'user',
+    entityId: existing.id,
+    action: 'delete',
+    description: `${req.user.name} removed the user account for ${existing.name}`
+  });
+
   res.status(204).send();
 });
 
 const updateStatus = asyncHandler(async (req, res) => {
   const user = await userModel.update(req.params.id, { status: req.body.status });
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'user',
+    entityId: user.id,
+    action: req.body.status === 'active' ? 'activate' : 'deactivate',
+    description: `${req.user.name} set ${user.name}'s account to ${req.body.status}`
+  });
+
   res.json({ data: user });
 });
 

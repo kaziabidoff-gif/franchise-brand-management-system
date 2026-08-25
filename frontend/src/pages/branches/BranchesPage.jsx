@@ -1,9 +1,12 @@
 import Badge from '../../components/ui/Badge';
 import ResourcePage from '../../components/common/ResourcePage';
 import useOptions from '../../hooks/useOptions';
+import { useAuth } from '../../context/AuthContext';
 import { statusOptions } from '../../constants/options';
+import { can } from '../../utils/permissions';
 
 export default function BranchesPage() {
+  const { user } = useAuth();
   const { users } = useOptions();
   const managers = users.filter((user) => user.role_slug === 'branch_manager');
 
@@ -12,6 +15,9 @@ export default function BranchesPage() {
       title="Branches"
       description="Create locations, maintain contact details, and assign branch managers."
       endpoint="/branches"
+      canCreate={can(user, 'branches', 'create')}
+      canEdit={can(user, 'branches', 'edit')}
+      canDelete={can(user, 'branches', 'delete')}
       fields={[
         { name: 'code', label: 'Branch Code', required: true },
         { name: 'name', label: 'Branch Name', required: true },

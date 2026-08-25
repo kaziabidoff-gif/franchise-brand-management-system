@@ -3,6 +3,7 @@ const ApiError = require('../utils/ApiError');
 const { getPagination, paginationMeta } = require('../utils/pagination');
 const { parseJson } = require('../utils/serializers');
 const brandAssetModel = require('../models/brandAsset.model');
+const { logActivity } = require('../models/activity.model');
 
 const listAssets = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -60,6 +61,14 @@ const createAsset = asyncHandler(async (req, res) => {
     uploaded_by: req.user.id
   });
 
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'asset',
+    entityId: asset.id,
+    action: 'upload',
+    description: `${req.user.name} uploaded ${asset.title}`
+  });
+
   res.status(201).json({ data: asset });
 });
 
@@ -80,6 +89,17 @@ const updateAsset = asyncHandler(async (req, res) => {
   }
 
   const asset = await brandAssetModel.update(req.params.id, updates);
+
+  if (updates.status && updates.status !== existing.status) {
+    await logActivity({
+      actorId: req.user.id,
+      entityType: 'asset',
+      entityId: asset.id,
+      action: updates.status,
+      description: `${req.user.name} marked ${asset.title} as ${updates.status}`
+    });
+  }
+
   res.json({ data: asset });
 });
 
@@ -91,6 +111,15 @@ const deleteAsset = asyncHandler(async (req, res) => {
   }
 
   await brandAssetModel.remove(req.params.id);
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'asset',
+    entityId: existing.id,
+    action: 'delete',
+    description: `${req.user.name} removed asset ${existing.title}`
+  });
+
   res.status(204).send();
 });
 

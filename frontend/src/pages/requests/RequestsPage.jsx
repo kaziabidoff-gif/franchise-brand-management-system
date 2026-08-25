@@ -4,13 +4,17 @@ import Button from '../../components/ui/Button';
 import ResourcePage from '../../components/common/ResourcePage';
 import useOptions from '../../hooks/useOptions';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { requestPriorities, statusOptions } from '../../constants/options';
+import { can } from '../../utils/permissions';
 
 export default function RequestsPage() {
+  const { user } = useAuth();
   const { branches, users, assets } = useOptions();
   const { showToast } = useToast();
   const designers = users.filter((user) => user.role_slug === 'graphic_designer');
+  const canDecide = can(user, 'requests', 'decide');
 
   const decide = async (row, reload, decision) => {
     await api.patch(`/requests/${row.id}/${decision}`, {
@@ -25,6 +29,8 @@ export default function RequestsPage() {
       title="Requests"
       description="Submit customization requests and approve or reject local changes."
       endpoint="/requests"
+      canDelete={can(user, 'requests', 'delete')}
+      canEdit={(row) => canDecide || row.requested_by === user?.id}
       fields={[
         { name: 'title', label: 'Title', required: true },
         { name: 'branch_id', label: 'Branch', type: 'select', required: true, options: branches.map((branch) => ({ value: branch.id, label: branch.name })) },
@@ -56,7 +62,7 @@ export default function RequestsPage() {
         { key: 'status', header: 'Status', render: (row) => <Badge value={row.status} /> }
       ]}
       extraActions={(row, reload) =>
-        row.status === 'approved' || row.status === 'rejected' ? null : (
+        canDecide && row.status !== 'approved' && row.status !== 'rejected' ? (
           <>
             <Button size="sm" icon={FiCheck} onClick={() => decide(row, reload, 'approve')}>
               Approve
@@ -65,7 +71,7 @@ export default function RequestsPage() {
               Reject
             </Button>
           </>
-        )
+        ) : null
       }
     />
   );

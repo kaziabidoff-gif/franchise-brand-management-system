@@ -2,6 +2,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const { getPagination, paginationMeta } = require('../utils/pagination');
 const guidelineModel = require('../models/guideline.model');
+const { logActivity } = require('../models/activity.model');
 
 const listGuidelines = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -28,6 +29,15 @@ const getGuideline = asyncHandler(async (req, res) => {
 
 const createGuideline = asyncHandler(async (req, res) => {
   const guideline = await guidelineModel.create({ ...req.body, published_by: req.user.id });
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'guideline',
+    entityId: guideline.id,
+    action: 'draft',
+    description: `${req.user.name} drafted guideline ${guideline.title}`
+  });
+
   res.status(201).json({ data: guideline });
 });
 
@@ -50,6 +60,15 @@ const publishGuideline = asyncHandler(async (req, res) => {
   }
 
   const guideline = await guidelineModel.publish(req.params.id, req.user.id);
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'guideline',
+    entityId: guideline.id,
+    action: 'publish',
+    description: `${req.user.name} published ${guideline.title}`
+  });
+
   res.json({ data: guideline });
 });
 
@@ -61,6 +80,15 @@ const deleteGuideline = asyncHandler(async (req, res) => {
   }
 
   await guidelineModel.remove(req.params.id);
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'guideline',
+    entityId: existing.id,
+    action: 'delete',
+    description: `${req.user.name} removed guideline ${existing.title}`
+  });
+
   res.status(204).send();
 });
 

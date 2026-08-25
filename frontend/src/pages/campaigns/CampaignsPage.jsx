@@ -1,10 +1,13 @@
 import Badge from '../../components/ui/Badge';
 import ResourcePage from '../../components/common/ResourcePage';
 import useOptions from '../../hooks/useOptions';
+import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { statusOptions } from '../../constants/options';
+import { can } from '../../utils/permissions';
 
 export default function CampaignsPage() {
+  const { user } = useAuth();
   const { branches, assets } = useOptions();
 
   return (
@@ -12,6 +15,9 @@ export default function CampaignsPage() {
       title="Campaigns"
       description="Create campaigns, attach brand assets, and assign target branches."
       endpoint="/campaigns"
+      canCreate={can(user, 'campaigns', 'create')}
+      canEdit={can(user, 'campaigns', 'edit')}
+      canDelete={can(user, 'campaigns', 'delete')}
       fields={[
         { name: 'name', label: 'Campaign Name', required: true },
         { name: 'status', label: 'Status', type: 'select', options: statusOptions.campaign.map((status) => ({ value: status, label: status })) },

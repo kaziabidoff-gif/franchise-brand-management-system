@@ -7,8 +7,10 @@ import ResourcePage from '../../components/common/ResourcePage';
 import AssetThumbnail from '../../components/assets/AssetThumbnail';
 import BranchAssetsView from '../../components/assets/BranchAssetsView';
 import useOptions from '../../hooks/useOptions';
+import { useAuth } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../services/api';
 import { assetCategories, assetTypes, statusOptions } from '../../constants/options';
+import { can } from '../../utils/permissions';
 
 const TABS = [
   { key: 'all', label: 'All Assets', icon: FiGrid },
@@ -16,9 +18,11 @@ const TABS = [
 ];
 
 export default function AssetsPage() {
+  const { user } = useAuth();
   const { branches } = useOptions();
   const [tab, setTab] = useState('all');
   const [autoOpenCreate, setAutoOpenCreate] = useState(false);
+  const canCreateAsset = can(user, 'assets', 'create');
 
   const download = (asset) => {
     window.open(`${API_BASE_URL}/assets/${asset.id}/download`, '_blank', 'noopener,noreferrer');
@@ -62,9 +66,11 @@ export default function AssetsPage() {
           actions={
             <>
               {tabStrip}
-              <Button icon={FiPlus} onClick={openAddAsset}>
-                Add Brand Asset
-              </Button>
+              {canCreateAsset ? (
+                <Button icon={FiPlus} onClick={openAddAsset}>
+                  Add Brand Asset
+                </Button>
+              ) : null}
             </>
           }
         />
@@ -82,6 +88,9 @@ export default function AssetsPage() {
         extraHeaderActions={tabStrip}
         autoOpenCreate={autoOpenCreate}
         onAutoOpened={() => setAutoOpenCreate(false)}
+        canCreate={canCreateAsset}
+        canEdit={can(user, 'assets', 'edit')}
+        canDelete={can(user, 'assets', 'delete')}
         multipart
         fields={[
           { name: 'title', label: 'Title', required: true },

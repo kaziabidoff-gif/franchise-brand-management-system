@@ -3,10 +3,13 @@ import Badge from '../../components/ui/Badge';
 import ResourcePage from '../../components/common/ResourcePage';
 import useOptions from '../../hooks/useOptions';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { statusOptions } from '../../constants/options';
+import { can } from '../../utils/permissions';
 
 export default function UsersPage() {
+  const { user } = useAuth();
   const { roles, branches } = useOptions();
   const { showToast } = useToast();
 
@@ -33,6 +36,7 @@ export default function UsersPage() {
       title="Users"
       description="Manage staff accounts, roles, status, and branch assignments."
       endpoint="/users"
+      canDelete={can(user, 'users', 'delete')}
       fields={fields}
       filters={[
         { key: 'status', label: 'All statuses', options: statusOptions.user },

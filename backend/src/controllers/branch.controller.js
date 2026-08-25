@@ -35,6 +35,15 @@ const getBranch = asyncHandler(async (req, res) => {
 
 const createBranch = asyncHandler(async (req, res) => {
   const branch = await branchModel.create(req.body);
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'branch',
+    entityId: branch.id,
+    action: 'create',
+    description: `${req.user.name} created branch ${branch.name}`
+  });
+
   res.status(201).json({ data: branch });
 });
 
@@ -46,6 +55,17 @@ const updateBranch = asyncHandler(async (req, res) => {
   }
 
   const branch = await branchModel.update(req.params.id, req.body);
+
+  if (req.body.status && req.body.status !== existing.status) {
+    await logActivity({
+      actorId: req.user.id,
+      entityType: 'branch',
+      entityId: branch.id,
+      action: req.body.status === 'active' ? 'activate' : 'deactivate',
+      description: `${req.user.name} set ${branch.name} to ${req.body.status}`
+    });
+  }
+
   res.json({ data: branch });
 });
 
@@ -57,6 +77,15 @@ const deleteBranch = asyncHandler(async (req, res) => {
   }
 
   await branchModel.remove(req.params.id);
+
+  await logActivity({
+    actorId: req.user.id,
+    entityType: 'branch',
+    entityId: existing.id,
+    action: 'delete',
+    description: `${req.user.name} removed branch ${existing.name}`
+  });
+
   res.status(204).send();
 });
 
