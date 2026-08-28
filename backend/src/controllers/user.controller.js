@@ -5,6 +5,7 @@ const { getPagination, paginationMeta } = require('../utils/pagination');
 const userModel = require('../models/user.model');
 const roleModel = require('../models/role.model');
 const { logActivity } = require('../models/activity.model');
+const notificationService = require('../services/notification.service');
 
 const listUsers = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -105,6 +106,16 @@ const updateStatus = asyncHandler(async (req, res) => {
     action: req.body.status === 'active' ? 'activate' : 'deactivate',
     description: `${req.user.name} set ${user.name}'s account to ${req.body.status}`
   });
+
+  await notificationService.notifyOne(
+    user.id,
+    {
+      title: 'Account Status Updated',
+      message: `Your FBMS account has been ${req.body.status === 'active' ? 'activated' : 'deactivated'}.`,
+      type: req.body.status === 'active' ? 'success' : 'warning'
+    },
+    req.user.id
+  );
 
   res.json({ data: user });
 });

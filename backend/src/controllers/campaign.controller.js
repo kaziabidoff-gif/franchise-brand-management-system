@@ -3,6 +3,7 @@ const ApiError = require('../utils/ApiError');
 const { getPagination, paginationMeta } = require('../utils/pagination');
 const campaignModel = require('../models/campaign.model');
 const { logActivity } = require('../models/activity.model');
+const notificationService = require('../services/notification.service');
 
 const listCampaigns = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -44,8 +45,27 @@ const createCampaign = asyncHandler(async (req, res) => {
     description: `${req.user.name} created campaign ${campaign.name}`
   });
 
+  const managementIds = await notificationService.getManagementUserIds(true);
+  await notificationService.notifyMany(
+    managementIds,
+    {
+      title: 'New Campaign Created',
+      message: `${req.user.name} created the campaign "${campaign.name}".`,
+      type: 'info'
+    },
+    req.user.id
+  );
+
   res.status(201).json({ data: campaign });
 });
+
+const STATUS_LABELS = {
+  scheduled: 'Campaign Scheduled',
+  active: 'Campaign Activated',
+  completed: 'Campaign Completed',
+  cancelled: 'Campaign Cancelled',
+  draft: 'Campaign Moved to Draft'
+};
 
 const updateCampaign = asyncHandler(async (req, res) => {
   const existing = await campaignModel.findById(req.params.id);
@@ -64,6 +84,19 @@ const updateCampaign = asyncHandler(async (req, res) => {
       action: req.body.status,
       description: `${req.user.name} marked campaign ${campaign.name} as ${req.body.status}`
     });
+
+    const managementIds = await notificationService.getManagementUserIds(true);
+    const recipients = existing.created_by ? [...managementIds, existing.created_by] : managementIds;
+
+    await notificationService.notifyMany(
+      recipients,
+      {
+        title: STATUS_LABELS[req.body.status] || 'Campaign Status Updated',
+        message: `"${campaign.name}" has been ${req.body.status} by ${req.user.name}.`,
+        type: req.body.status === 'cancelled' ? 'warning' : 'success'
+      },
+      req.user.id
+    );
   }
 
   res.json({ data: campaign });

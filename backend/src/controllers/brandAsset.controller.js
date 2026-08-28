@@ -4,6 +4,7 @@ const { getPagination, paginationMeta } = require('../utils/pagination');
 const { parseJson } = require('../utils/serializers');
 const brandAssetModel = require('../models/brandAsset.model');
 const { logActivity } = require('../models/activity.model');
+const notificationService = require('../services/notification.service');
 
 const listAssets = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -69,6 +70,20 @@ const createAsset = asyncHandler(async (req, res) => {
     description: `${req.user.name} uploaded ${asset.title}`
   });
 
+  const recipients = asset.branch_id
+    ? [await notificationService.getBranchManagerId(asset.branch_id), ...(await notificationService.getUsersByRole('brand_manager'))]
+    : await notificationService.getManagementUserIds();
+
+  await notificationService.notifyMany(
+    recipients,
+    {
+      title: 'New Brand Asset Uploaded',
+      message: `${req.user.name} uploaded "${asset.title}".`,
+      type: 'info'
+    },
+    req.user.id
+  );
+
   res.status(201).json({ data: asset });
 });
 
@@ -98,6 +113,16 @@ const updateAsset = asyncHandler(async (req, res) => {
       action: updates.status,
       description: `${req.user.name} marked ${asset.title} as ${updates.status}`
     });
+
+    await notificationService.notifyOne(
+      existing.uploaded_by,
+      {
+        title: 'Brand Asset Status Updated',
+        message: `"${asset.title}" was marked as ${updates.status} by ${req.user.name}.`,
+        type: updates.status === 'archived' ? 'warning' : 'success'
+      },
+      req.user.id
+    );
   }
 
   res.json({ data: asset });

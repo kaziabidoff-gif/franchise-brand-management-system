@@ -3,6 +3,7 @@ const ApiError = require('../utils/ApiError');
 const { getPagination, paginationMeta } = require('../utils/pagination');
 const guidelineModel = require('../models/guideline.model');
 const { logActivity } = require('../models/activity.model');
+const notificationService = require('../services/notification.service');
 
 const listGuidelines = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -38,6 +39,17 @@ const createGuideline = asyncHandler(async (req, res) => {
     description: `${req.user.name} drafted guideline ${guideline.title}`
   });
 
+  const managementIds = await notificationService.getManagementUserIds();
+  await notificationService.notifyMany(
+    managementIds,
+    {
+      title: 'New Brand Guideline Drafted',
+      message: `"${guideline.title}" was drafted by ${req.user.name}.`,
+      type: 'info'
+    },
+    req.user.id
+  );
+
   res.status(201).json({ data: guideline });
 });
 
@@ -68,6 +80,22 @@ const publishGuideline = asyncHandler(async (req, res) => {
     action: 'publish',
     description: `${req.user.name} published ${guideline.title}`
   });
+
+  const affectedRoleIds = await notificationService.getUsersByRole([
+    'graphic_designer',
+    'marketing_executive',
+    'branch_manager'
+  ]);
+
+  await notificationService.notifyMany(
+    affectedRoleIds,
+    {
+      title: 'Brand Guidelines Updated',
+      message: `"${guideline.title}" has been published.`,
+      type: 'success'
+    },
+    req.user.id
+  );
 
   res.json({ data: guideline });
 });

@@ -4,6 +4,7 @@ const { getPagination, paginationMeta } = require('../utils/pagination');
 const branchModel = require('../models/branch.model');
 const brandAssetModel = require('../models/brandAsset.model');
 const { logActivity } = require('../models/activity.model');
+const notificationService = require('../services/notification.service');
 
 const listBranches = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -44,6 +45,17 @@ const createBranch = asyncHandler(async (req, res) => {
     description: `${req.user.name} created branch ${branch.name}`
   });
 
+  const managementIds = await notificationService.getManagementUserIds();
+  await notificationService.notifyMany(
+    managementIds,
+    {
+      title: 'New Branch Created',
+      message: `${req.user.name} created branch "${branch.name}".`,
+      type: 'info'
+    },
+    req.user.id
+  );
+
   res.status(201).json({ data: branch });
 });
 
@@ -64,6 +76,25 @@ const updateBranch = asyncHandler(async (req, res) => {
       action: req.body.status === 'active' ? 'activate' : 'deactivate',
       description: `${req.user.name} set ${branch.name} to ${req.body.status}`
     });
+  }
+
+  if (
+    Object.prototype.hasOwnProperty.call(req.body, 'manager_id') &&
+    req.body.manager_id &&
+    req.body.manager_id !== existing.manager_id
+  ) {
+    const isReassignment = Boolean(existing.manager_id);
+    await notificationService.notifyOne(
+      req.body.manager_id,
+      {
+        title: isReassignment ? 'Branch Assignment Updated' : 'Branch Assignment',
+        message: isReassignment
+          ? `You are now responsible for ${branch.name}.`
+          : `You have been assigned as the manager of ${branch.name}.`,
+        type: 'info'
+      },
+      req.user.id
+    );
   }
 
   res.json({ data: branch });

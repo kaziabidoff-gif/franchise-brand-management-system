@@ -14,10 +14,16 @@ export default function TopNavbar({ onMenuClick }) {
   const [unread, setUnread] = useState(0);
 
   useEffect(() => {
-    api
-      .get('/notifications', { params: { limit: 1 } })
-      .then(({ data }) => setUnread(data.unread || 0))
-      .catch(() => setUnread(0));
+    const fetchUnread = () => {
+      api
+        .get('/notifications', { params: { limit: 1 } })
+        .then(({ data }) => setUnread(data.unread || 0))
+        .catch(() => setUnread(0));
+    };
+
+    fetchUnread();
+    const intervalId = setInterval(fetchUnread, 20000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleLogout = async () => {

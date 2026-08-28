@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { FiCheck, FiChevronDown, FiFlag, FiPlus, FiTrash2 } from 'react-icons/fi';
-import Badge from '../ui/Badge';
-import LoadingSpinner from '../common/LoadingSpinner';
-import ErrorState from '../common/ErrorState';
-import Tooltip from '../common/Tooltip';
+import Badge from '../../components/ui/Badge';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorState from '../../components/common/ErrorState';
+import Tooltip from '../../components/common/Tooltip';
 import { useToast } from '../../context/ToastContext';
 import { clearCompletedTodos, createTodo, deleteTodo, listTodos, updateTodo } from '../../services/todo.service';
 import { formatDate } from '../../utils/formatters';
