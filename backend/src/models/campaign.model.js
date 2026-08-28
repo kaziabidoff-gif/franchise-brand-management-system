@@ -28,7 +28,9 @@ const buildFilters = (filters) => {
   }
 
   if (filters.branchId) {
-    where.push('EXISTS (SELECT 1 FROM campaign_branches cb_filter WHERE cb_filter.campaign_id = c.id AND cb_filter.branch_id = ?)');
+    where.push(
+      'EXISTS (SELECT 1 FROM campaign_branches cb_filter WHERE cb_filter.campaign_id = c.id AND cb_filter.branch_id = ?)'
+    );
     params.push(Number(filters.branchId));
   }
 
@@ -61,10 +63,15 @@ const findAll = async (filters, pagination) => {
     total: totalRows[0].total
   };
 };
-const findOptions = () => query('SELECT id, name, status FROM campaigns ORDER BY name ASC');
+
+const findOptions = () =>
+  query('SELECT id, name, status FROM campaigns ORDER BY name ASC');
 
 const findById = async (id) => {
-  const rows = await query(`${campaignSelect} WHERE c.id = ? GROUP BY c.id LIMIT 1`, [id]);
+  const rows = await query(
+    `${campaignSelect} WHERE c.id = ? GROUP BY c.id LIMIT 1`,
+    [id]
+  );
 
   if (!rows.length) {
     return null;
@@ -92,9 +99,28 @@ const findById = async (id) => {
   return { ...rows[0], branches, assets };
 };
 
-const syncRelations = async (connection, campaignId, branchIds, assetIds) => {
-  await connection.execute('DELETE FROM campaign_branches WHERE campaign_id = ?', [campaignId]);
-  await connection.execute('DELETE FROM campaign_assets WHERE campaign_id = ?', [campaignId]);
+const syncRelations = async (
+  connection,
+  campaignId,
+  branchIds,
+  assetIds
+) => {
+  // TEMPORARY DEBUG LOG
+  console.log('Campaign relations:', {
+    campaignId,
+    branchIds,
+    assetIds
+  });
+
+  await connection.execute(
+    'DELETE FROM campaign_branches WHERE campaign_id = ?',
+    [campaignId]
+  );
+
+  await connection.execute(
+    'DELETE FROM campaign_assets WHERE campaign_id = ?',
+    [campaignId]
+  );
 
   for (const branchId of toIntArray(branchIds)) {
     await connection.execute(
@@ -116,6 +142,7 @@ const create = async (data) => {
 
   try {
     await connection.beginTransaction();
+
     const [result] = await connection.execute(
       `INSERT INTO campaigns
         (name, description, start_date, end_date, budget, status, created_by)
@@ -131,8 +158,15 @@ const create = async (data) => {
       ]
     );
 
-    await syncRelations(connection, result.insertId, data.branch_ids, data.asset_ids);
+    await syncRelations(
+      connection,
+      result.insertId,
+      data.branch_ids,
+      data.asset_ids
+    );
+
     await connection.commit();
+
     return findById(result.insertId);
   } catch (error) {
     await connection.rollback();
@@ -150,7 +184,15 @@ const update = async (id, data) => {
 
     const fields = [];
     const params = [];
-    ['name', 'description', 'start_date', 'end_date', 'budget', 'status'].forEach((field) => {
+
+    [
+      'name',
+      'description',
+      'start_date',
+      'end_date',
+      'budget',
+      'status'
+    ].forEach((field) => {
       if (Object.prototype.hasOwnProperty.call(data, field)) {
         fields.push(`${field} = ?`);
         params.push(data[field] ?? null);
@@ -158,20 +200,32 @@ const update = async (id, data) => {
     });
 
     if (fields.length) {
-      await connection.execute(`UPDATE campaigns SET ${fields.join(', ')} WHERE id = ?`, [...params, id]);
+      await connection.execute(
+        `UPDATE campaigns SET ${fields.join(', ')} WHERE id = ?`,
+        [...params, id]
+      );
     }
 
-    if (Object.prototype.hasOwnProperty.call(data, 'branch_ids') || Object.prototype.hasOwnProperty.call(data, 'asset_ids')) {
+    if (
+      Object.prototype.hasOwnProperty.call(data, 'branch_ids') ||
+      Object.prototype.hasOwnProperty.call(data, 'asset_ids')
+    ) {
       const existing = await findById(id);
+
       await syncRelations(
         connection,
         id,
-        Object.prototype.hasOwnProperty.call(data, 'branch_ids') ? data.branch_ids : existing.branches.map((branch) => branch.id),
-        Object.prototype.hasOwnProperty.call(data, 'asset_ids') ? data.asset_ids : existing.assets.map((asset) => asset.id)
+        Object.prototype.hasOwnProperty.call(data, 'branch_ids')
+          ? data.branch_ids
+          : existing.branches.map((branch) => branch.id),
+        Object.prototype.hasOwnProperty.call(data, 'asset_ids')
+          ? data.asset_ids
+          : existing.assets.map((asset) => asset.id)
       );
     }
 
     await connection.commit();
+
     return findById(id);
   } catch (error) {
     await connection.rollback();
@@ -185,4 +239,11 @@ const remove = async (id) => {
   await query('DELETE FROM campaigns WHERE id = ?', [id]);
 };
 
-module.exports = { findAll, findOptions, findById, create, update, remove };
+module.exports = {
+  findAll,
+  findOptions,
+  findById,
+  create,
+  update,
+  remove
+};
