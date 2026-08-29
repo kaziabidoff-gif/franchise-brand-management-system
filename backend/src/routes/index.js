@@ -11,6 +11,7 @@ const dashboardRoutes = require('./dashboard.routes');
 const reportRoutes = require('./report.routes');
 const profileRoutes = require('./profile.routes');
 const todoRoutes = require('./todo.routes');
+const branchActivityRoutes = require('./branchActivity.routes');
 
 const router = express.Router();
 
@@ -26,5 +27,6 @@ router.use('/notifications', notificationRoutes);
 router.use('/reports', reportRoutes);
 router.use('/profile', profileRoutes);
 router.use('/todos', todoRoutes);
+router.use('/branch-activities', branchActivityRoutes);
 
 module.exports = router;

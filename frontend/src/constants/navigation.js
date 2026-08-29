@@ -8,7 +8,8 @@ import {
   FiMapPin,
   FiMessageSquare,
   FiUser,
-  FiUsers
+  FiUsers,
+  FiActivity
 } from 'react-icons/fi';
 
 export const roleLabels = {
@@ -28,6 +29,8 @@ export const navItems = [
   { key: 'guidelines', label: 'Guidelines', path: '/guidelines', icon: FiBookOpen, roles: ['all'] },
   { key: 'requests', label: 'Requests', path: '/requests', icon: FiMessageSquare, roles: ['all'] },
   { key: 'reports', label: 'Reports', path: '/reports', icon: FiBarChart2, roles: ['super_admin', 'brand_manager', 'marketing_executive'] },
+  { key: 'branch-users', label: 'Branch Users', path: '/branch-users', icon: FiUsers, roles: ['super_admin', 'brand_manager'] },
+  { key: 'branch-activities', label: 'Branch Activities', path: '/branch-activities', icon: FiActivity, roles: ['super_admin', 'brand_manager', 'marketing_executive', 'branch_manager'] },
   { key: 'notifications', label: 'Notifications', path: '/notifications', icon: FiBell, roles: ['all'] },
   { key: 'profile', label: 'Profile', path: '/profile', icon: FiUser, roles: ['all'] }
 ];
