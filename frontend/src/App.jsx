@@ -9,6 +9,7 @@ import UsersPage from './pages/users/UsersPage';
 import BranchesPage from './pages/branches/BranchesPage';
 import AssetsPage from './pages/assets/AssetsPage';
 import CampaignsPage from './pages/campaigns/CampaignsPage';
+import CampaignDetailsPage from './pages/campaigns/CampaignDetailsPage';
 import GuidelinesPage from './pages/guidelines/GuidelinesPage';
 import RequestListPage from './pages/requests/RequestListPage';
 import CreateRequestPage from './pages/requests/CreateRequestPage';
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Route>
+
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -32,7 +34,13 @@ export default function App() {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/branches" element={<BranchesPage />} />
           <Route path="/assets" element={<AssetsPage />} />
+
           <Route path="/campaigns" element={<CampaignsPage />} />
+          <Route
+            path="/campaigns/:id"
+            element={<CampaignDetailsPage />}
+          />
+
           <Route path="/guidelines" element={<GuidelinesPage />} />
           <Route path="/requests" element={<RequestListPage />} />
           <Route path="/requests/new" element={<CreateRequestPage />} />

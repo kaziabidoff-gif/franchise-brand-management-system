@@ -21,6 +21,7 @@ export default function ResourcePage({
   canCreate = true,
   canEdit = true,
   canDelete = true,
+  viewAction,
   multipart = false,
   transformSubmit,
   extraActions,
@@ -129,6 +130,7 @@ export default function ResourcePage({
         rows={resource.rows}
         loading={resource.loading}
         actions={{
+          view: viewAction,
           edit: canEdit ? openEdit : undefined,
           delete: canDelete ? setDeleteRecord : undefined,
           canEdit: typeof canEdit === 'function' ? canEdit : undefined,

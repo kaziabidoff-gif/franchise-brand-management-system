@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import Badge from '../../components/ui/Badge';
 import ResourcePage from '../../components/common/ResourcePage';
 import useOptions from '../../hooks/useOptions';
@@ -8,8 +9,8 @@ import { can } from '../../utils/permissions';
 
 export default function CampaignsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { branches, assets } = useOptions();
-
   // DEBUG: Check whether branches and assets are actually
   // being received from the API.
   console.log('CAMPAIGN OPTIONS:', {
@@ -22,6 +23,7 @@ export default function CampaignsPage() {
       title="Campaigns"
       description="Create campaigns, attach brand assets, and assign target branches."
       endpoint="/campaigns"
+      viewAction={(row) => navigate(`/campaigns/${row.id}`)}
       canCreate={can(user, 'campaigns', 'create')}
       canEdit={can(user, 'campaigns', 'edit')}
       canDelete={can(user, 'campaigns', 'delete')}
