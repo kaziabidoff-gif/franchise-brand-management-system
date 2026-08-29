@@ -16,6 +16,8 @@ import RequestDetailsPage from './pages/requests/RequestDetailsPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import ReportsPage from './pages/reports/ReportsPage';
 import ProfilePage from './pages/profile/ProfilePage';
+import BranchUserAssociationPage from './pages/BranchUser/BranchUserAssociationPage';
+import BranchActivityMonitoringPage from './pages/BranchActivity/BranchActivityMonitoringPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -40,6 +42,8 @@ export default function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/branch-users" element={<BranchUserAssociationPage />} />
+          <Route path="/branch-activities" element={<BranchActivityMonitoringPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>
