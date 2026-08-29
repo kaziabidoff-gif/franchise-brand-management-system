@@ -1,34 +1,45 @@
-import Badge from '../../components/ui/Badge';
-import { formatDate } from '../../utils/formatters';
+import { Link } from 'react-router-dom';
+import { navItems } from '../../constants/navigation';
 
-// System activity is an oversight tool, not something every role needs to see
-// on their own dashboard - keeping it to management-tier roles only.
-const ALLOWED_ROLES = ['super_admin', 'brand_manager', 'branch_manager'];
+// Skip linking back to the Dashboard itself - you're already here, so that
+// tile would just be dead weight in a list meant to jump you somewhere else.
+const HIDDEN_KEYS = ['dashboard'];
 
-export const canViewActivityLog = (roleSlug) => ALLOWED_ROLES.includes(roleSlug);
+export default function QuickActions({ actions = [] }) {
+  const visibleActions = actions.filter((key) => !HIDDEN_KEYS.includes(key));
 
-export default function RecentActivity({ activities = [] }) {
+  if (visibleActions.length === 0) {
+    return null;
+  }
+
   return (
     <section className="rounded-lg border border-ink-200 bg-white p-5 dark:border-ink-700 dark:bg-ink-900">
-      <h2 className="text-lg font-bold text-ink-950 dark:text-white">Recent activities</h2>
-      <div className="mt-4 space-y-3">
-        {activities.length === 0 ? (
-          <p className="rounded-md border border-dashed border-ink-300 bg-ink-50/60 p-4 text-center text-sm text-ink-500 dark:border-ink-700 dark:bg-ink-800/60 dark:text-ink-400">
-            No activity yet.
-          </p>
-        ) : (
-          activities.map((activity) => (
-            <div key={activity.id} className="rounded-md border border-ink-100 bg-ink-50/60 p-3 dark:border-ink-700 dark:bg-ink-800/60">
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-semibold text-ink-800 dark:text-ink-100">{activity.description}</p>
-                <Badge>{activity.action}</Badge>
-              </div>
-              <p className="mt-1 text-xs text-ink-500 dark:text-ink-400">
-                {activity.actor_name || 'System'} · {formatDate(activity.created_at)}
-              </p>
-            </div>
-          ))
-        )}
+      <h2 className="text-lg font-bold text-ink-950 dark:text-white">Quick actions</h2>
+      <div className="mt-4 grid grid-cols-4 gap-3">
+        {visibleActions.map((key) => {
+          const item = navItems.find((navItem) => navItem.key === key);
+
+          if (!item) {
+            return null;
+          }
+
+          const Icon = item.icon;
+          return (
+            <Link
+              key={key}
+              to={item.path}
+              title={item.label}
+              className="group flex flex-col items-center justify-center gap-2 rounded-lg border border-ink-200 px-2 py-3 text-center transition hover:border-brand-200 hover:bg-brand-50 dark:border-ink-700 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink-100 text-ink-600 transition group-hover:bg-brand-100 group-hover:text-brand-600 dark:bg-ink-800 dark:text-ink-300 dark:group-hover:bg-brand-500/20 dark:group-hover:text-brand-300">
+                <Icon className="h-4 w-4" />
+              </span>
+              <span className="w-full truncate text-[11px] font-semibold text-ink-700 dark:text-ink-200">
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

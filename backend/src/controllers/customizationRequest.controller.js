@@ -4,6 +4,7 @@ const { getPagination, paginationMeta } = require('../utils/pagination');
 const requestModel = require('../models/customizationRequest.model');
 const { logActivity } = require('../models/activity.model');
 const notificationService = require('../services/notification.service');
+const requestTaskService = require('../services/requestTask.service');
 
 const listRequests = asyncHandler(async (req, res) => {
   const pagination = getPagination(req.query);
@@ -60,6 +61,28 @@ const createRequest = asyncHandler(async (req, res) => {
     req.user.id
   );
 
+  if (request.assigned_to) {
+    await logActivity({
+      actorId: req.user.id,
+      entityType: 'request',
+      entityId: request.id,
+      action: 'assign',
+      description: `${req.user.name} assigned "${request.title}" to ${request.assigned_to_name || 'a designer'}`
+    });
+
+    await notificationService.notifyOne(
+      request.assigned_to,
+      {
+        title: 'Customization Request Assigned',
+        message: `You have been assigned "${request.title}".`,
+        type: 'info'
+      },
+      req.user.id
+    );
+
+    await requestTaskService.syncAssignment(request, null);
+  }
+
   res.status(201).json({ data: request });
 });
 
@@ -94,16 +117,43 @@ const updateRequest = asyncHandler(async (req, res) => {
   }
   const request = await requestModel.update(req.params.id, payload);
 
-  if (payload.assigned_to && payload.assigned_to !== existing.assigned_to) {
-    await notificationService.notifyOne(
-      payload.assigned_to,
-      {
-        title: 'Customization Request Assigned',
-        message: `You have been assigned "${request.title}".`,
-        type: 'info'
-      },
-      req.user.id
-    );
+  if (Object.prototype.hasOwnProperty.call(payload, 'assigned_to')) {
+    const newAssignedTo = payload.assigned_to || null;
+    const previousAssignedTo = existing.assigned_to || null;
+
+    if (newAssignedTo !== previousAssignedTo) {
+      if (newAssignedTo) {
+        await logActivity({
+          actorId: req.user.id,
+          entityType: 'request',
+          entityId: request.id,
+          action: previousAssignedTo ? 'reassign' : 'assign',
+          description: `${req.user.name} ${previousAssignedTo ? 'reassigned' : 'assigned'} "${request.title}" to ${request.assigned_to_name || 'a designer'}`
+        });
+
+        await notificationService.notifyOne(
+          newAssignedTo,
+          {
+            title: previousAssignedTo ? 'Customization Request Reassigned' : 'Customization Request Assigned',
+            message: `You have been assigned "${request.title}".`,
+            type: 'info'
+          },
+          req.user.id
+        );
+      } else if (previousAssignedTo) {
+        await notificationService.notifyOne(
+          previousAssignedTo,
+          {
+            title: 'Customization Request Unassigned',
+            message: `You have been unassigned from "${request.title}".`,
+            type: 'info'
+          },
+          req.user.id
+        );
+      }
+
+      await requestTaskService.syncAssignment(request, previousAssignedTo);
+    }
   }
 
   res.json({ data: request });
@@ -125,6 +175,18 @@ const deleteRequest = asyncHandler(async (req, res) => {
     action: 'delete',
     description: `${req.user.name} removed request: ${existing.title}`
   });
+
+  await notificationService.notifyMany(
+    [existing.assigned_to, existing.requested_by],
+    {
+      title: 'Customization Request Cancelled',
+      message: `"${existing.title}" has been removed.`,
+      type: 'warning'
+    },
+    req.user.id
+  );
+
+  await requestTaskService.cancelTask(existing);
 
   res.status(204).send();
 });
@@ -153,6 +215,8 @@ const approveRequest = asyncHandler(async (req, res) => {
     req.user.id
   );
 
+  await requestTaskService.resolveTask(request);
+
   res.json({ data: request });
 });
 
@@ -180,6 +244,8 @@ const rejectRequest = asyncHandler(async (req, res) => {
     req.user.id
   );
 
+  await requestTaskService.resolveTask(request);
+
   res.json({ data: request });
 });
 
@@ -206,6 +272,18 @@ const requestRevision = asyncHandler(async (req, res) => {
     },
     req.user.id
   );
+
+  if (request.assigned_to) {
+    await notificationService.notifyOne(
+      request.assigned_to,
+      {
+        title: 'Revision Requested',
+        message: `"${request.title}", assigned to you, needs revisions. ${request.response || 'Please review the feedback.'}`,
+        type: 'warning'
+      },
+      req.user.id
+    );
+  }
 
   res.json({ data: request });
 });

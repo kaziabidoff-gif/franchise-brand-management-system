@@ -191,11 +191,14 @@ CREATE TABLE todos (
   priority ENUM('low', 'medium', 'high', 'urgent') NOT NULL DEFAULT 'medium',
   is_done TINYINT(1) NOT NULL DEFAULT 0,
   due_date DATE NULL,
+  source_type VARCHAR(30) NULL,
+  source_id INT NULL,
   position INT NOT NULL DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_todos_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   INDEX idx_todos_user_done (user_id, is_done),
   INDEX idx_todos_user_position (user_id, position),
-  INDEX idx_todos_user_priority (user_id, priority)
+  INDEX idx_todos_user_priority (user_id, priority),
+  INDEX idx_todos_source (source_type, source_id)
 );

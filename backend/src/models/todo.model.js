@@ -1,7 +1,7 @@
 const { query } = require('../config/db');
 
 const todoSelect =
-  'SELECT id, user_id, title, priority, is_done, due_date, position, created_at, updated_at FROM todos';
+  'SELECT id, user_id, title, priority, is_done, due_date, source_type, source_id, position, created_at, updated_at FROM todos';
 
 const PRIORITY_ORDER = "FIELD(priority, 'urgent', 'high', 'medium', 'low')";
 
@@ -29,9 +29,18 @@ const create = async (userId, data) => {
   const position = await nextPosition(userId);
 
   const result = await query(
-    `INSERT INTO todos (user_id, title, priority, is_done, due_date, position)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [userId, data.title, data.priority || 'medium', data.is_done ? 1 : 0, data.due_date || null, position]
+    `INSERT INTO todos (user_id, title, priority, is_done, due_date, source_type, source_id, position)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      userId,
+      data.title,
+      data.priority || 'medium',
+      data.is_done ? 1 : 0,
+      data.due_date || null,
+      data.source_type || null,
+      data.source_id || null,
+      position
+    ]
   );
 
   return findById(result.insertId, userId);
@@ -90,4 +99,39 @@ const summary = async (userId) => {
   };
 };
 
-module.exports = { findAllForUser, findById, create, update, remove, clearCompleted, summary };
+const findBySource = async (userId, sourceType, sourceId) => {
+  const rows = await query(
+    `${todoSelect} WHERE user_id = ? AND source_type = ? AND source_id = ? LIMIT 1`,
+    [userId, sourceType, sourceId]
+  );
+  return rows[0] || null;
+};
+
+const removeBySource = async (userId, sourceType, sourceId) => {
+  await query('DELETE FROM todos WHERE user_id = ? AND source_type = ? AND source_id = ?', [
+    userId,
+    sourceType,
+    sourceId
+  ]);
+};
+
+const completeBySource = async (userId, sourceType, sourceId) => {
+  await query('UPDATE todos SET is_done = 1 WHERE user_id = ? AND source_type = ? AND source_id = ?', [
+    userId,
+    sourceType,
+    sourceId
+  ]);
+};
+
+module.exports = {
+  findAllForUser,
+  findById,
+  create,
+  update,
+  remove,
+  clearCompleted,
+  summary,
+  findBySource,
+  removeBySource,
+  completeBySource
+};

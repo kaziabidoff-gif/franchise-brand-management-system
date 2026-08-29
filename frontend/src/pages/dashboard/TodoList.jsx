@@ -273,6 +273,11 @@ export default function TodoList() {
                         full: todo.title
                       }}
                     />
+                    {todo.source_type === 'customization_request' ? (
+                      <span className="mt-0.5 inline-block rounded bg-brand-50 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+                        Design task
+                      </span>
+                    ) : null}
                     {todo.due_date ? (
                       <p
                         className={`text-xs ${
