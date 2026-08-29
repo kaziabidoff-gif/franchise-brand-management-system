@@ -8,16 +8,45 @@ const getValue = (record, field) => {
     return field.defaultValue || '';
   }
 
-  const value = record[field.name];
+  let value = record[field.name];
+
+  // Handle campaign relation fields
+  if (
+    (value === undefined || value === null) &&
+    field.name.endsWith('_ids')
+  ) {
+    const relationMap = {
+      branch_ids: 'branches',
+      asset_ids: 'assets'
+    };
+
+    const relationName = relationMap[field.name];
+
+    if (relationName) {
+      value = record[relationName];
+    }
+  }
 
   if (Array.isArray(value)) {
+    // For checkbox groups, return array of IDs
+    if (field.type === 'checkbox-group') {
+      return value.map((item) => String(item.id || item));
+    }
+
     return value.map((item) => item.id || item).join(',');
   }
 
   return value ?? field.defaultValue ?? '';
 };
 
-export default function ResourceForm({ fields, record, submitLabel = 'Save', onSubmit, onCancel, loading }) {
+export default function ResourceForm({
+  fields,
+  record,
+  submitLabel = 'Save',
+  onSubmit,
+  onCancel,
+  loading
+}) {
   const {
     register,
     handleSubmit,
@@ -27,9 +56,11 @@ export default function ResourceForm({ fields, record, submitLabel = 'Save', onS
 
   useEffect(() => {
     const values = {};
+
     fields.forEach((field) => {
       values[field.name] = getValue(record, field);
     });
+
     reset(values);
   }, [fields, record, reset]);
 
@@ -48,9 +79,9 @@ export default function ResourceForm({ fields, record, submitLabel = 'Save', onS
       if (field.type === 'multiselect' || field.type === 'tags') {
         normalized[field.name] = normalized[field.name]
           ? normalized[field.name]
-              .split(',')
-              .map((item) => item.trim())
-              .filter(Boolean)
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean)
           : [];
       }
     });
@@ -62,7 +93,10 @@ export default function ResourceForm({ fields, record, submitLabel = 'Save', onS
     <form className="space-y-5" onSubmit={handleSubmit(submit)}>
       <div className="grid gap-4 md:grid-cols-2">
         {fields.map((field) => {
-          const rules = field.required ? { required: `${field.label} is required.` } : {};
+          const rules = field.required
+            ? { required: `${field.label} is required.` }
+            : {};
+
           const error = errors[field.name];
 
           if (field.hiddenOnEdit && record) {
@@ -70,13 +104,27 @@ export default function ResourceForm({ fields, record, submitLabel = 'Save', onS
           }
 
           if (field.type === 'textarea') {
-            return <Textarea key={field.name} label={field.label} error={error} className="md:col-span-2" {...register(field.name, rules)} />;
+            return (
+              <Textarea
+                key={field.name}
+                label={field.label}
+                error={error}
+                className="md:col-span-2"
+                {...register(field.name, rules)}
+              />
+            );
           }
 
           if (field.type === 'select') {
             return (
-              <Select key={field.name} label={field.label} error={error} {...register(field.name, rules)}>
+              <Select
+                key={field.name}
+                label={field.label}
+                error={error}
+                {...register(field.name, rules)}
+              >
                 <option value="">Select {field.label}</option>
+
                 {field.options?.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -87,7 +135,15 @@ export default function ResourceForm({ fields, record, submitLabel = 'Save', onS
           }
 
           if (field.type === 'file') {
-            return <FileInput key={field.name} label={field.label} error={error} accept={field.accept} {...register(field.name, record ? {} : rules)} />;
+            return (
+              <FileInput
+                key={field.name}
+                label={field.label}
+                error={error}
+                accept={field.accept}
+                {...register(field.name, record ? {} : rules)}
+              />
+            );
           }
 
           if (field.type === 'checkbox-group') {
@@ -105,9 +161,10 @@ export default function ResourceForm({ fields, record, submitLabel = 'Save', onS
                     >
                       <input
                         type="checkbox"
-                        value={option.value}
+                        value={String(option.value)}
                         {...register(field.name)}
                       />
+
                       <span>{option.label}</span>
                     </label>
                   ))}
@@ -116,13 +173,26 @@ export default function ResourceForm({ fields, record, submitLabel = 'Save', onS
             );
           }
 
-          return <Input key={field.name} label={field.label} type={field.type || 'text'} error={error} {...register(field.name, rules)} />;
+          return (
+            <Input
+              key={field.name}
+              label={field.label}
+              type={field.type || 'text'}
+              error={error}
+              {...register(field.name, rules)}
+            />
+          );
         })}
       </div>
+
       <div className="flex justify-end gap-3 border-t border-ink-200 pt-4 dark:border-ink-700">
-        <Button variant="secondary" onClick={onCancel}>
+        <Button
+          variant="secondary"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
+
         <Button type="submit" disabled={loading}>
           {loading ? 'Saving...' : submitLabel}
         </Button>
